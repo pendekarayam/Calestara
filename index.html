@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OBSIDIAN-Vault v9.0: Final Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- THEME COLOR VARIABLES --- */
+        :root {
+            --primary-color: #00FFCC;
+            --secondary-color: #CC00FF;
+            --danger-color: #ff3333;
+            --warning-color: #ffae00;
+            --info-color: #00bfff;
+            --bg-color: #050508;
+            --main-bg-color: rgba(16, 18, 28, 0.85);
+            --section-bg-color: #141622;
+            --input-bg-color: #0A0A0F;
+            --text-color: #EAEAEA;
+            --subtle-text-color: #888;
+        }
+
+        /* --- KEYFRAMES & ANIMATIONS --- */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes subtle-glow-pulse {
+            0%, 100% { box-shadow: 0 0 15px -5px var(--secondary-color); border-color: var(--secondary-color); }
+            50% { box-shadow: 0 0 25px -5px var(--secondary-color); border-color: var(--secondary-color); }
+        }
+        
+        /* --- GENERAL STYLES --- */
+        body {
+            font-family: 'Fira Code', 'Courier New', monospace;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        #starfield-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        header {
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(5px);
+            padding: 1rem;
+            text-align: center;
+            border-bottom: 2px solid var(--primary-color);
+            box-shadow: 0 4px 25px -10px var(--primary-color);
+            position: sticky; top: 0; z-index: 1000;
+        }
+
+        header h1 {
+            font-size: clamp(1.5em, 5vw, 2.5em);
+            color: var(--primary-color);
+            text-shadow: 0 0 12px var(--primary-color), 0 0 25px var(--primary-color);
+            margin: 0 0 0.5rem; letter-spacing: 2px;
+        }
+        
+        main {
+            flex-grow: 1; max-width: 1000px; width: 90%;
+            margin: 2rem auto; padding: 1.5rem;
+            background: var(--main-bg-color); backdrop-filter: blur(10px);
+            border-radius: 10px; border: 1px solid var(--primary-color);
+            box-shadow: 0 0 30px -10px var(--primary-color);
+            animation: fadeIn 1s ease-out; z-index: 10;
+        }
+
+        .section-container {
+            background-color: var(--section-bg-color);
+            padding: 1.5rem; border-radius: 10px;
+            margin-bottom: 2rem; border: 1px solid var(--secondary-color);
+            animation: subtle-glow-pulse 8s infinite ease-in-out;
+            display: flex; flex-direction: column; gap: 1rem;
+        }
+
+        .section-container h3 {
+            color: var(--primary-color); text-align: center;
+            border-bottom: 1px dashed var(--primary-color);
+            padding-bottom: 1rem; margin-top: 0; margin-bottom: 1rem;
+            text-shadow: 0 0 8px var(--primary-color);
+            font-size: clamp(1.2em, 4vw, 1.5em);
+        }
+
+        .input-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .input-group label { color: var(--secondary-color); font-size: 1.1em; text-shadow: 0 0 4px var(--secondary-color); }
+        .input-group label.subtle-label { color: var(--subtle-text-color); font-size: 0.9em; text-shadow: none; font-style: italic; }
+
+        textarea, input[type="password"], input[type="text"] {
+            width: 100%; padding: 1rem; border: 1px solid var(--primary-color);
+            border-radius: 8px; background-color: var(--input-bg-color);
+            color: var(--primary-color); font-family: 'Fira Code', monospace; font-size: 1em;
+            box-shadow: inset 0 0 8px -2px var(--primary-color); outline: none;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        textarea:focus, input:focus {
+            border-color: var(--secondary-color);
+            box-shadow: inset 0 0 10px -2px var(--secondary-color), 0 0 15px -5px var(--secondary-color);
+        }
+
+        .buttons-group { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+        button {
+            background-color: var(--primary-color); color: #000000; border: none;
+            padding: 0.75rem 1.5rem; border-radius: 25px; font-family: 'Fira Code', monospace;
+            font-size: 1em; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;
+            box-shadow: 0 0 15px -5px var(--primary-color), 0 0 15px -5px var(--primary-color) inset;
+            transition: all 0.2s ease-out; font-weight: bold; position: relative;
+        }
+        button:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 0 25px -5px var(--secondary-color), 0 0 25px -5px var(--secondary-color) inset;
+            background-color: var(--secondary-color); color: var(--text-color);
+        }
+        button:active { transform: translateY(-1px) scale(0.98); }
+        button:disabled {
+            background-color: #555; color: var(--subtle-text-color);
+            cursor: not-allowed; box-shadow: none; transform: none;
+        }
+        button.danger { background-color: var(--danger-color); color: white; box-shadow: 0 0 15px var(--danger-color); }
+        button.danger:hover { background-color: #ff0000; box-shadow: 0 0 25px #ff0000; }
+        
+        /* --- NYX PROTOCOL STYLES --- */
+        #nyxChatWindow {
+            background-color: var(--input-bg-color); border: 1px solid var(--primary-color);
+            border-radius: 8px; height: 350px; overflow-y: auto; padding: 1rem;
+            display: flex; flex-direction: column; gap: 0.75rem;
+        }
+        .nyx-message {
+            padding: 0.5rem 1rem; border-radius: 15px; max-width: 80%;
+            word-wrap: break-word; line-height: 1.4; animation: fadeIn 0.3s ease-out;
+        }
+        .nyx-message.self {
+            background-color: var(--primary-color); color: #000;
+            border-bottom-right-radius: 3px; align-self: flex-end; text-align: right;
+        }
+        .nyx-message.other {
+            background-color: var(--secondary-color); color: var(--text-color);
+            border-bottom-left-radius: 3px; align-self: flex-start;
+        }
+        .nyx-message .sender { font-size: 0.7em; opacity: 0.7; display: block; margin-bottom: 0.25rem; }
+        .nyx-message .timestamp { font-size: 0.6em; opacity: 0.6; display: block; margin-top: 0.5rem; }
+        .nyx-system-message { text-align: center; font-style: italic; color: var(--subtle-text-color); font-size: 0.9em; }
+        
+        .nyx-chat-actions { display: flex; gap: 0.5rem; }
+        .nyx-chat-actions input { flex-grow: 1; }
+
+        #nyxUserIdDisplay {
+            padding: 0.5rem; margin-top: 1rem; background: var(--input-bg-color);
+            border: 1px solid var(--info-color); border-radius: 8px; text-align: center;
+            font-size: 0.8em; color: var(--subtle-text-color); user-select: all;
+        }
+
+        /* --- Other Protocols Expander --- */
+        .protocols-expander summary {
+            cursor: pointer; color: var(--primary-color); text-align: center; 
+            margin-bottom: 2rem; border: 1px solid var(--primary-color); 
+            padding: 0.75rem; border-radius: 8px;
+            transition: background-color 0.3s ease;
+            display: flex; justify-content: center; align-items: center; gap: 0.5rem;
+        }
+        .protocols-expander summary:hover { background-color: rgba(0, 255, 204, 0.1); }
+        .protocols-expander summary::after {
+            content: '▼'; display: inline-block; transition: transform 0.3s ease-out;
+        }
+        .protocols-expander[open] > summary::after { transform: rotate(-180deg); }
+        .protocols-expander .section-container { animation: none; } /* Disable pulse on hidden protocols */
+
+        /* --- UI COMPONENTS --- */
+        .message-box {
+            padding: 1rem; border-radius: 8px; text-align: center; font-size: 1em;
+            display: none; transition: all 0.3s ease-out; border: 1px solid;
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            z-index: 5000; backdrop-filter: blur(5px); width: 90%; max-width: 500px;
+        }
+        .message-box.success { background-color: rgba(0, 255, 204, 0.2); color: var(--primary-color); border-color: var(--primary-color); box-shadow: 0 0 10px var(--primary-color); }
+        .message-box.error { background-color: rgba(255, 0, 0, 0.3); color: var(--danger-color); border-color: var(--danger-color); box-shadow: 0 0 10px var(--danger-color); }
+    </style>
+</head>
+
+<body>
+    <canvas id="starfield-bg"></canvas>
+    <div id="messageBox" class="message-box"></div>
+    
+    <header>
+        <h1>OBSIDIAN-Vault v9.0</h1>
+        <p class="tagline">Secure Communications Link Engaged</p>
+    </header>
+
+    <main>
+        <section class="section-container">
+            <h3>Nyx Protocol: Secure Messenger</h3>
+             <div class="input-group" id="nyxLoginView">
+                <label for="nyxRoomId">Room ID</label>
+                <input type="text" id="nyxRoomId" placeholder="Kosongkan untuk membuat room baru">
+                <label for="nyxRoomPassword">Room Password</label>
+                <input type="password" id="nyxRoomPassword" placeholder="Password untuk membuat atau bergabung...">
+                <div class="buttons-group" style="margin-top:1rem;">
+                    <button id="nyxCreateRoomBtn">Create Room</button>
+                    <button id="nyxJoinRoomBtn">Join Room</button>
+                </div>
+            </div>
+
+            <div id="nyxChatView" style="display: none; flex-direction:column; gap:1rem;">
+                <div class="input-group">
+                    <label>Obrolan Aman (<span id="nyxCurrentRoomId" style="color: var(--info-color); user-select: all;"></span>)</label>
+                    <div id="nyxChatWindow"><div class="nyx-system-message">Membangun koneksi terenkripsi...</div></div>
+                </div>
+                <div class="input-group">
+                    <div class="nyx-chat-actions">
+                        <input type="text" id="nyxMessageInput" placeholder="Ketik pesan terenkripsi...">
+                        <button id="nyxSendBtn">Send</button>
+                    </div>
+                </div>
+                 <div class="buttons-group">
+                    <button id="nyxLeaveRoomBtn">Leave Room</button>
+                    <button id="nyxDestroyRoomBtn" class="danger">Destroy Room</button>
+                </div>
+            </div>
+             <div id="nyxUserIdDisplay">ID Sesi: <span id="nyxUserId" style="color: var(--warning-color);">Menunggu otentikasi...</span></div>
+        </section>
+
+        <details class="protocols-expander">
+            <summary>Buka Protokol Enkripsi Lainnya</summary>
+            
+            <section class="section-container">
+                <h3>Standard Cipher Protocol</h3>
+                 <div class="input-group">
+                    <label for="inputText">Teks Asli / Cipher</label>
+                    <textarea id="inputText" placeholder="Ketik pesan rahasia..."></textarea>
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Password enkripsi/dekripsi...">
+                </div>
+                <div class="buttons-group" style="margin-top:1rem;">
+                    <button id="encodeButton">Enkripsi</button>
+                    <button id="decodeButton">Dekripsi</button>
+                </div>
+                <div class="input-group">
+                    <label for="outputResult">Hasil</label>
+                    <div id="outputResult" style="min-height:80px; background-color: var(--input-bg-color); padding:1rem; border-radius:8px; border: 1px solid var(--primary-color);"></div>
+                </div>
+            </section>
+
+            <section class="section-container">
+                <h3>Aegis Protocol</h3>
+                 <div class="input-group">
+                    <label for="aegisInput">Pesan Rahasia</label>
+                    <textarea id="aegisInput" placeholder="Pesan yang akan disamarkan..."></textarea>
+                </div>
+                <div class="input-group">
+                    <label for="aegisStyle">Gaya Narasi</label>
+                    <input type="text" id="aegisStyle" placeholder="Contoh: Surat cinta, puisi, dll.">
+                </div>
+                <div class="input-group">
+                    <label for="aegisPassword">Password Aegis</label>
+                    <input type="password" id="aegisPassword" placeholder="Password untuk mengunci narasi...">
+                </div>
+                 <div class="input-group">
+                    <label for="aegisApiKey">Gemini API Key</label>
+                    <input type="password" id="aegisApiKey" placeholder="Dapatkan dari Google AI Studio...">
+                </div>
+                <div class="buttons-group" style="margin-top:1rem;">
+                    <button id="aegisGenerateAndEncryptButton">Samarkan & Enkripsi</button>
+                    <button id="aegisDecryptButton">Dekripsi Narasi</button>
+                </div>
+                 <div class="input-group">
+                    <label>Hasil / Ciphertext</label>
+                    <div id="aegisOutput" style="min-height:80px; background-color: var(--input-bg-color); padding:1rem; border-radius:8px; border: 1px solid var(--primary-color);"></div>
+                </div>
+            </section>
+        </details>
+    </main>
+    
+    <footer style="text-align:center; padding:15px; color: #666; background:rgba(0,0,0,0.8); border-top: 1px solid #333; z-index:10;">
+        <p>Ultimate Edition v9.0 | For Calestara by WuLyena & Gemini</p>
+    </footer>
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, addDoc, deleteDoc, onSnapshot, collection, query, orderBy, getDocs, serverTimestamp, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const vaultApp = {
+                els: {},
+                state: { db: null, auth: null, userId: null, currentRoomId: null, currentRoomPassword: null, nyxUnsubscribe: null },
+                
+                async init() {
+                    this.cacheElements();
+                    this.setupEventListeners();
+                    this.modules.starfield.init.call(this);
+                    await this.initFirebase();
+                },
+
+                cacheElements() {
+                    const allIds = Array.from(document.querySelectorAll('[id]'));
+                    allIds.forEach(el => this.els[el.id.replace(/-([a-z])/g, g => g[1].toUpperCase())] = el);
+                },
+
+                async initFirebase() {
+                    try {
+                        const firebaseConfigStr = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
+                        if (!firebaseConfigStr) {
+                           throw new Error("Konfigurasi Firebase tidak ditemukan. Nyx Protocol dinonaktifkan.");
+                        }
+                        
+                        const firebaseConfig = JSON.parse(firebaseConfigStr);
+                        const app = initializeApp(firebaseConfig);
+                        this.state.db = getFirestore(app);
+                        this.state.auth = getAuth(app);
+
+                        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+                        if (initialAuthToken) {
+                            await signInWithCustomToken(this.state.auth, initialAuthToken);
+                        } else {
+                            await signInAnonymously(this.state.auth);
+                        }
+                        
+                        this.state.userId = this.state.auth.currentUser.uid;
+                        this.els.nyxUserId.textContent = this.state.userId;
+                        this.showMessage("Koneksi aman berhasil dibuat.", "success");
+
+                    } catch (e) {
+                         this.showMessage(`Koneksi Gagal: ${e.message}`, "error", 10000);
+                         this.els.nyxLoginView.innerHTML = `<div class="nyx-system-message" style="color:var(--danger-color);">Nyx Protocol Gagal Terhubung ke Server.</div>`;
+                    }
+                },
+                
+                setupEventListeners() {
+                    this.els.nyxCreateRoomBtn.addEventListener('click', () => this.modules.nyx.createRoom.call(this));
+                    this.els.nyxJoinRoomBtn.addEventListener('click', () => this.modules.nyx.joinRoom.call(this));
+                    this.els.nyxSendBtn.addEventListener('click', () => this.modules.nyx.sendMessage.call(this));
+                    this.els.nyxMessageInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); this.modules.nyx.sendMessage.call(this); }});
+                    this.els.nyxLeaveRoomBtn.addEventListener('click', () => this.modules.nyx.leaveRoom.call(this));
+                    this.els.nyxDestroyRoomBtn.addEventListener('click', () => this.modules.nyx.destroyRoom.call(this));
+                    this.els.encodeButton.addEventListener('click', () => this.modules.standardCipher.encrypt.call(this));
+                    this.els.decodeButton.addEventListener('click', () => this.modules.standardCipher.decrypt.call(this));
+                    this.els.aegisGenerateAndEncryptButton.addEventListener('click', () => this.modules.aegis.generateAndEncrypt.call(this));
+                    this.els.aegisDecryptButton.addEventListener('click', () => this.modules.aegis.decrypt.call(this));
+                },
+
+                showMessage(message, type = 'info', duration = 4000) {
+                     this.els.messageBox.textContent = message;
+                     this.els.messageBox.className = `message-box ${type}`;
+                     this.els.messageBox.style.display = 'block';
+                     if (this.els.messageBox.timer) clearTimeout(this.els.messageBox.timer);
+                     this.els.messageBox.timer = setTimeout(() => { this.els.messageBox.style.display = 'none'; }, duration);
+                },
+
+                cryptoCore: {
+                    bufferToBase64: (buffer) => btoa(String.fromCharCode.apply(null, new Uint8Array(buffer))),
+                    base64ToBuffer: (base64) => Uint8Array.from(atob(base64), c => c.charCodeAt(0)),
+                    async getKey(password, salt) {
+                        const enc = new TextEncoder();
+                        // THIS IS THE CORRECTED PART
+                        const baseKey = await window.crypto.subtle.importKey("raw", enc.encode(password), { name: "PBKDF2" }, false, ["deriveKey"]);
+                        return await window.crypto.subtle.deriveKey({ "name": "PBKDF2", "salt": salt, "iterations": 250000, "hash": "SHA-512" }, baseKey, { "name": "AES-GCM", "length": 256 }, true, ["encrypt", "decrypt"]);
+                    },
+                    async encryptSingle(data, password) {
+                        const salt = window.crypto.getRandomValues(new Uint8Array(16));
+                        const iv = window.crypto.getRandomValues(new Uint8Array(12));
+                        const key = await this.getKey(password, salt);
+                        const encodedData = new TextEncoder().encode(data);
+                        const ciphertext = await window.crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, key, encodedData);
+                        const combined = new Uint8Array(salt.length + iv.length + ciphertext.byteLength);
+                        combined.set(salt, 0); combined.set(iv, salt.length); combined.set(new Uint8Array(ciphertext), salt.length + iv.length);
+                        return this.bufferToBase64(combined);
+                    },
+                    async decryptSingle(base64Ciphertext, password) {
+                        const combined = this.base64ToBuffer(base64Ciphertext);
+                        if (combined.length < 28) throw new Error("Ciphertext tidak valid.");
+                        const salt = combined.slice(0, 16);
+                        const iv = combined.slice(16, 28);
+                        const ciphertext = combined.slice(28);
+                        const key = await this.getKey(password, salt);
+                        const decrypted = await window.crypto.subtle.decrypt({ name: "AES-GCM", iv: iv }, key, ciphertext);
+                        return new TextDecoder().decode(decrypted);
+                    }
+                },
+
+                modules: {
+                    starfield: {
+                        init() {
+                             const canvas = this.els.starfieldBg; if (!canvas) return;
+                             const ctx = canvas.getContext('2d');
+                             let stars;
+                             const setup = () => {
+                                canvas.width = window.innerWidth;
+                                canvas.height = window.innerHeight;
+                                stars = Array.from({ length: 300 }, () => ({
+                                    x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+                                    radius: Math.random() * 1.5, alpha: Math.random(),
+                                    alphaChange: (Math.random() * 0.02) - 0.01
+                                }));
+                             };
+                             const draw = () => {
+                                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                                ctx.fillStyle = `rgba(0, 255, 204, 1)`;
+                                stars.forEach(star => {
+                                    star.alpha += star.alphaChange;
+                                    if (star.alpha <= 0 || star.alpha >= 1) star.alphaChange *= -1;
+                                    ctx.globalAlpha = star.alpha;
+                                    ctx.beginPath();
+                                    ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                                    ctx.fill();
+                                });
+                                requestAnimationFrame(draw);
+                            };
+                            setup();
+                            window.addEventListener('resize', setup);
+                            draw();
+                        }
+                    },
+                    nyx: {
+                        async createRoom() {
+                            const password = this.els.nyxRoomPassword.value;
+                            if (!password) { return this.showMessage("Password ruangan wajib diisi.", "error"); }
+                            const nouns = ["alpha", "beta", "gamma", "delta", "omega", "sigma", "nova", "comet"];
+                            const roomId = `nyx-${nouns[Math.floor(Math.random() * nouns.length)]}-${Math.random().toString(36).substring(2, 6)}`;
+                            this.els.nyxRoomId.value = roomId;
+                            try {
+                                const checkCipher = await vaultApp.cryptoCore.encryptSingle("nyx-connection-test", password);
+                                await setDoc(doc(this.state.db, "nyx_rooms", roomId), { 
+                                    createdAt: serverTimestamp(), owner: this.state.userId, passwordCheck: checkCipher
+                                });
+                                this.showMessage(`Ruangan ${roomId} berhasil dibuat!`, "success");
+                                await this.modules.nyx.joinRoom.call(this, true);
+                            } catch (e) { this.showMessage(`Gagal membuat ruangan: ${e.message}`, "error"); }
+                        },
+                        async joinRoom(isCreator = false) {
+                            const roomId = this.els.nyxRoomId.value;
+                            const password = this.els.nyxRoomPassword.value;
+                            if (!roomId || !password) return this.showMessage("Room ID dan Password wajib diisi.", "error");
+                            try {
+                                const roomDoc = await getDoc(doc(this.state.db, "nyx_rooms", roomId));
+                                if (!roomDoc.exists()) return this.showMessage("Room ID tidak ditemukan.", "error");
+                                if (!isCreator) await vaultApp.cryptoCore.decryptSingle(roomDoc.data().passwordCheck, password);
+                                this.state.currentRoomId = roomId; this.state.currentRoomPassword = password;
+                                this.els.nyxLoginView.style.display = 'none'; this.els.nyxChatView.style.display = 'flex';
+                                this.els.nyxCurrentRoomId.textContent = roomId;
+                                this.els.nyxChatWindow.innerHTML = `<div class="nyx-system-message">Berhasil terhubung.</div>`;
+                                this.modules.nyx.listenForMessages.call(this);
+                            } catch (e) { this.showMessage("Gagal bergabung: Password salah.", "error"); }
+                        },
+                        listenForMessages() {
+                            const q = query(collection(this.state.db, "nyx_rooms", this.state.currentRoomId, "messages"), orderBy("timestamp", "asc"));
+                            if(this.state.nyxUnsubscribe) this.state.nyxUnsubscribe();
+                            this.state.nyxUnsubscribe = onSnapshot(q, (snapshot) => {
+                                const chatWindow = this.els.nyxChatWindow;
+                                if(chatWindow.querySelector('.nyx-system-message')) chatWindow.innerHTML = '';
+                                snapshot.docChanges().forEach(async (change) => {
+                                    if (change.type === 'added') {
+                                        try {
+                                            const decrypted = await vaultApp.cryptoCore.decryptSingle(change.doc.data().ciphertext, this.state.currentRoomPassword);
+                                            chatWindow.appendChild(this.modules.nyx.createMessageElement.call(this, decrypted, change.doc.data().sender, change.doc.data().timestamp));
+                                        } catch (e) { /* Ignore */ }
+                                    }
+                                });
+                                setTimeout(() => chatWindow.scrollTop = chatWindow.scrollHeight, 100);
+                            });
+                        },
+                        createMessageElement(text, senderId, timestamp) {
+                            const msgDiv = document.createElement('div');
+                            msgDiv.classList.add('nyx-message', senderId === this.state.userId ? 'self' : 'other');
+                            const senderName = senderId === this.state.userId ? "You" : `User: ${senderId.substring(0, 8)}...`;
+                            const timeString = timestamp ? new Date(timestamp.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+                            const textNode = document.createElement('span'); textNode.textContent = text;
+                            msgDiv.innerHTML = `<span class="sender">${senderName}</span>`;
+                            msgDiv.appendChild(textNode);
+                            msgDiv.innerHTML += `<span class="timestamp">${timeString}</span>`;
+                            return msgDiv;
+                        },
+                        async sendMessage() {
+                            const messageText = this.els.nyxMessageInput.value;
+                            if (!messageText.trim()) return;
+                            try {
+                                const ciphertext = await vaultApp.cryptoCore.encryptSingle(messageText, this.state.currentRoomPassword);
+                                await addDoc(collection(this.state.db, "nyx_rooms", this.state.currentRoomId, "messages"), {
+                                    ciphertext, sender: this.state.userId, timestamp: serverTimestamp()
+                                });
+                                this.els.nyxMessageInput.value = ''; this.els.nyxMessageInput.focus();
+                            } catch (e) { this.showMessage("Gagal mengirim pesan.", "error"); }
+                        },
+                        leaveRoom() {
+                            if (this.state.nyxUnsubscribe) this.state.nyxUnsubscribe();
+                            Object.assign(this.state, { currentRoomId: null, currentRoomPassword: null });
+                            this.els.nyxChatView.style.display = 'none'; this.els.nyxLoginView.style.display = 'block';
+                            this.els.nyxRoomId.value = ''; this.els.nyxRoomPassword.value = '';
+                            this.showMessage("Anda telah meninggalkan ruangan.", "info");
+                        },
+                        async destroyRoom() {
+                            const roomId = this.state.currentRoomId;
+                            if (!roomId || prompt("PERINGATAN: Aksi ini akan menghapus seluruh riwayat chat secara permanen.\nKetik 'DESTROY' untuk konfirmasi.") !== 'DESTROY') return;
+                            try {
+                                const batch = writeBatch(this.state.db);
+                                const messagesSnapshot = await getDocs(collection(this.state.db, "nyx_rooms", roomId, "messages"));
+                                messagesSnapshot.forEach(doc => batch.delete(doc.ref));
+                                batch.delete(doc(this.state.db, "nyx_rooms", roomId));
+                                await batch.commit();
+                                this.modules.nyx.leaveRoom.call(this);
+                                this.showMessage("Ruangan berhasil dihancurkan.", "success");
+                            } catch (e) { this.showMessage("Gagal menghancurkan ruangan.", "error"); }
+                        }
+                    },
+                    standardCipher: {
+                        async encrypt() {
+                            if (!this.els.inputText.value || !this.els.password.value) return this.showMessage("Teks dan Password wajib diisi.", "error");
+                            try {
+                                const ciphertext = await vaultApp.cryptoCore.encryptSingle(this.els.inputText.value, this.els.password.value);
+                                this.els.outputResult.textContent = ciphertext;
+                                this.showMessage("Enkripsi berhasil.", "success");
+                            } catch(e) { this.showMessage("Enkripsi gagal.", "error"); }
+                        },
+                        async decrypt() {
+                            if (!this.els.inputText.value || !this.els.password.value) return this.showMessage("Ciphertext dan Password wajib diisi.", "error");
+                            try {
+                                const decrypted = await vaultApp.cryptoCore.decryptSingle(this.els.inputText.value, this.els.password.value);
+                                this.els.outputResult.textContent = decrypted;
+                                this.showMessage("Dekripsi berhasil.", "success");
+                            } catch (e) { this.showMessage("Dekripsi gagal: Password salah atau data korup.", "error"); }
+                        }
+                    },
+                    aegis: {
+                        async generateAndEncrypt() {
+                             const { aegisInput, aegisStyle, aegisPassword, aegisApiKey, aegisOutput } = this.els;
+                             if (!aegisInput.value || !aegisStyle.value || !aegisPassword.value || !aegisApiKey.value) return this.showMessage("Semua kolom Aegis wajib diisi.", "error");
+                             aegisOutput.textContent = 'Menghubungi AI...';
+                             const prompt = `Ubah pesan rahasia berikut: "${aegisInput.value}" menjadi sebuah narasi puitis dengan gaya: "${aegisStyle.value}". Jangan sebutkan pesan aslinya.`;
+                             try {
+                                const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+                                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${aegisApiKey.value}`, {
+                                     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+                                });
+                                if (!response.ok) throw new Error(`AI Gagal merespon. Status: ${response.status}`);
+                                const result = await response.json();
+                                const poem = result.candidates[0].content.parts[0].text.trim();
+                                aegisOutput.textContent = 'Mengenkripsi narasi...';
+                                const ciphertext = await vaultApp.cryptoCore.encryptSingle(poem, aegisPassword.value);
+                                aegisOutput.textContent = ciphertext;
+                                this.showMessage("Narasi berhasil dibuat & dienkripsi!", "success");
+                            } catch (e) { this.showMessage(`Error Aegis: ${e.message}`, "error"); aegisOutput.textContent = ''; }
+                        },
+                        async decrypt() {
+                            const { aegisOutput, aegisPassword } = this.els;
+                            if (!aegisOutput.textContent || !aegisPassword.value) return this.showMessage("Ciphertext dan Password Aegis wajib diisi.", "error");
+                            try {
+                                const decrypted = await vaultApp.cryptoCore.decryptSingle(aegisOutput.textContent, aegisPassword.value);
+                                aegisOutput.textContent = decrypted;
+                            } catch(e) { this.showMessage("Dekripsi Aegis gagal.", "error"); }
+                        }
+                    }
+                }
+            };
+            vaultApp.init();
+        });
+    </script>
+</body>
+</html>
