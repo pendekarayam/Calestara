@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WULYENA-CALESTARA Vault v15.1: Apex Edition</title>
+    <title>WULYENA-CALESTARA Vault v15.2: Apex Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -24,6 +24,7 @@
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes subtle-glow-pulse { 0%, 100% { box-shadow: 0 0 15px -5px var(--secondary-color); border-color: var(--secondary-color); } 50% { box-shadow: 0 0 25px -5px var(--secondary-color); border-color: var(--secondary-color); } }
+        @keyframes pulse-red { 0%, 100% { box-shadow: 0 0 12px var(--danger-color); } 50% { box-shadow: 0 0 20px var(--danger-color); } }
         
         body {
             font-family: 'Fira Code', 'Courier New', monospace;
@@ -141,7 +142,7 @@
     <div id="messageBox" class="message-box"></div>
     
     <header>
-        <h1 data-lang-key="main_title">WULYENA-CALESTARA Vault v15.0</h1>
+        <h1 data-lang-key="main_title">WULYENA-CALESTARA Vault v15.1</h1>
         <p class="tagline" data-lang-key="tagline">Apex Edition</p>
         <div class="lang-switcher">
             <button id="lang-id" class="active">ID</button>
@@ -209,7 +210,7 @@
     </main>
     
     <footer style="text-align:center; padding:15px; color: #666; background:rgba(0,0,0,0.8); border-top: 1px solid #333; z-index:10;">
-        <p data-lang-key="footer_text">Apex Edition | Wulyena & Calestara</p>
+        <p data-lang-key="footer_text">Apex Edition | For Wulyena by Calestara & Gemini</p>
     </footer>
     
     <script>
@@ -362,10 +363,10 @@
                                 const decryptedMessage = await this.cryptoCore.decryptSingle(atob(hash), password);
                                 const revealedText = this.modules.language.translations[this.state.lang].ghost_revealed;
                                 this.els.ghostReaderView.innerHTML = `
-                                <div class="self-destruct-message">
-                                    <p>${revealedText.title}</p>
+                                <div class="self-destruct-message" style="border-color: var(--danger-color); animation: pulse-red 1.5s infinite;">
+                                    <p style="color:var(--danger-color); font-size: 1.5rem;">${revealedText.title}</p>
                                     <div class="message-content">${decryptedMessage.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
-                                    <span>${revealedText.description}</span>
+                                    <span style="color:var(--warning-color); font-weight:bold;">${revealedText.description}</span>
                                     <div class="output-actions"><button id="copyGhostMessageBtn">${revealedText.button}</button></div>
                                 </div>`;
                                 document.getElementById('copyGhostMessageBtn').addEventListener('click', (e) => this.copyToClipboard(decryptedMessage, e.target));
@@ -386,6 +387,9 @@
                                 const finalLink = `${window.location.href.split('#')[0]}#${payload}`;
                                 ghostLinkOutput.textContent = finalLink;
                                 ghostLinkContainer.style.display = 'block';
+                                if (!document.getElementById('copyGhostLinkBtn')) {
+                                    this.els.ghostLinkContainer.querySelector('.output-actions').innerHTML = `<button id="copyGhostLinkBtn">${this.modules.language.translations[this.state.lang].copy_link_btn}</button>`;
+                                }
                                 document.getElementById('copyGhostLinkBtn').onclick = (e) => this.copyToClipboard(finalLink, e.target);
                                 this.showMessage(this.modules.language.translations[this.state.lang].ghost_success, "success");
                             } catch (e) { this.showMessage(this.modules.language.translations[this.state.lang].generic_fail, "error"); }
@@ -512,7 +516,7 @@
                                 caelus_reveal_error: "Teks Cipher dan Password wajib diisi.", caelus_reveal_success: "Pesan Terungkap", caelus_reveal_fail: "Gagal menampilkan pesan: Password salah atau teks bukan cipher yang valid.",
                                 guide_title: "Panduan Penggunaan",
                                 ghost_reader: { title: "GHOST PROTOCOL: PESAN MASUK", description: "Sebuah pesan terenkripsi terdeteksi. Masukkan password untuk membukanya. Pesan ini akan hancur setelah halaman ditutup.", placeholder: "Masukkan password untuk membaca...", button: "Buka Pesan" },
-                                ghost_revealed: { title: "PESAN TELAH DIBUKA", description: "Pesan ini telah hancur. Salin sekarang atau akan hilang selamanya.", button: "Salin Pesan"},
+                                ghost_revealed: { title: "PESAN TERBUKA & AKAN HANCUR", description: "PERINGATAN: Salin pesan ini sekarang! Link asli masih dapat digunakan. Segera tutup halaman ini untuk keamanan maksimal.", button: "Salin Pesan & Hancurkan Jejak"},
                                 ghost_failed: { title: "DEKRIPSI GAGAL", description: "Password salah. Link ini telah rusak dan pesan di dalamnya hancur."},
                                 guide_content: {
                                     ghost: { title: "Ghost Protocol (Pesan Sekali Baca)", description: "Gunakan ini untuk mengirim pesan yang paling sensitif. Penerima hanya punya satu kesempatan untuk membaca. Setelah link dibuka dan halaman ditutup, pesan akan hancur selamanya dan link menjadi tidak valid.", steps: ["Masukkan pesan rahasia dan buat password.", "Klik <code>Generate Ghost Link</code>.", "Salin link yang muncul dan kirim ke penerima.", "Berikan password melalui jalur yang berbeda (telepon, chat lain, dll)."] },
@@ -599,7 +603,7 @@
                                 caelus_reveal_fail: "Failed to reveal message: Wrong password or invalid ciphertext.",
                                 guide_title: "User Guide",
                                 ghost_reader: { title: "GHOST PROTOCOL: INCOMING MESSAGE", description: "An encrypted message was detected. Enter the password to decrypt it. This message will be destroyed once the page is closed.", placeholder: "Enter password to read...", button: "Reveal Message" },
-                                ghost_revealed: { title: "MESSAGE REVEALED", description: "This message has been destroyed. Copy it now or it will be lost forever.", button: "Copy Message"},
+                                ghost_revealed: { title: "MESSAGE REVEALED & PRIMED", description: "WARNING: Copy this message now! The original link can still be used. Close this page immediately for maximum security.", button: "Copy Message & Burn Trace"},
                                 ghost_failed: { title: "DECRYPTION FAILED", description: "The password was incorrect. This link is now corrupted and the message is destroyed."},
                                 guide_content: {
                                     ghost: { title: "Ghost Protocol (One-Time Message)", description: "Use this to send your most sensitive messages. The recipient has only one chance to read it. Once the link is opened and the page is closed, the message is destroyed forever and the link becomes invalid.", steps: ["Enter the secret message and create a password.", "Click <code>Generate Ghost Link</code>.", "Copy the resulting link and send it to the recipient.", "Provide the password through a different channel (phone, another chat, etc.)."] },
