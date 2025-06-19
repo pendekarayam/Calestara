@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WULYENA-CALESTARA Vault v12.0: Lazarus Edition</title>
+    <title>WULYENA-CALESTARA Vault v15.1: Apex Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -45,6 +45,14 @@
             text-shadow: 0 0 12px var(--primary-color), 0 0 25px var(--primary-color);
             margin: 0 0 0.5rem; letter-spacing: 2px;
         }
+        .lang-switcher { display: flex; justify-content: center; gap: 0.5rem; margin-top: 0.5rem; }
+        .lang-switcher button {
+            background: transparent; color: var(--primary-color); border: 1px solid var(--primary-color);
+            padding: 0.25rem 0.75rem; font-size: 0.8em; border-radius: 5px; cursor: pointer;
+        }
+        .lang-switcher button.active {
+            background: var(--primary-color); color: #000; font-weight: bold;
+        }
         
         main {
             flex-grow: 1; max-width: 1000px; width: 90%; margin: 2rem auto; padding: 0.5rem;
@@ -73,7 +81,7 @@
         .protocols-expander summary:hover { background-color: rgba(0, 255, 204, 0.1); }
         .protocols-expander summary::after { content: '▼'; display: inline-block; transition: transform 0.3s ease-out; margin-left: 10px; }
         .protocols-expander[open] > summary::after { transform: rotate(-180deg); }
-        .protocols-expander[open] > .section-container { margin-top: 2rem; }
+        .protocols-expander[open] > .section-container, .protocols-expander[open] > #guide-section { margin-top: 2rem; }
         .protocols-expander .section-container { animation: none; }
 
         .input-group { display: flex; flex-direction: column; gap: 0.5rem; }
@@ -81,7 +89,7 @@
         .output-actions { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.5rem; }
         .output-actions button { background: var(--input-bg-color); color: var(--primary-color); border: 1px solid var(--primary-color); padding: 0.25rem 0.75rem; font-size: 0.8em; text-transform: none; border-radius: 5px; }
 
-        textarea, input[type="password"], input[type="text"] {
+        textarea, input[type="password"], input[type="text"], input[type="range"] {
             width: 100%; padding: 1rem; border: 1px solid var(--primary-color);
             border-radius: 8px; background-color: var(--input-bg-color);
             color: var(--primary-color); font-family: 'Fira Code', monospace; font-size: 1em;
@@ -89,6 +97,7 @@
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
         textarea { min-height: 120px; resize: vertical; }
+        input[type="range"] { padding: 0; }
         textarea:focus, input:focus { border-color: var(--secondary-color); box-shadow: inset 0 0 10px -2px var(--secondary-color), 0 0 15px -5px var(--secondary-color); }
 
         .buttons-group { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
@@ -112,6 +121,18 @@
         .message-box { padding: 1rem; border-radius: 8px; text-align: center; font-size: 1em; display: none; transition: all 0.3s ease-out; border: 1px solid; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 5000; backdrop-filter: blur(5px); width: 90%; max-width: 500px; }
         .message-box.success { background-color: rgba(0, 255, 204, 0.2); color: var(--primary-color); border-color: var(--primary-color); box-shadow: 0 0 10px var(--primary-color); }
         .message-box.error { background-color: rgba(255, 0, 0, 0.3); color: var(--danger-color); border-color: var(--danger-color); box-shadow: 0 0 10px var(--danger-color); }
+        
+        .checkbox-group { display: flex; gap: 1.5rem; justify-content: center; }
+        .checkbox-group label { display: flex; align-items: center; gap: 0.5rem; color: var(--text-color); font-size: 1em; text-shadow: none;}
+        .range-group { display: flex; align-items: center; gap: 1rem; }
+        .range-group output { font-weight: bold; color: var(--primary-color); }
+        
+        #guide-section { text-align: left; color: var(--subtle-text-color); line-height: 1.8; padding: 0 1rem;}
+        #guide-section h4 { color: var(--primary-color); margin-top: 1.5rem; }
+        #guide-section p { margin-bottom: 1rem; }
+        #guide-section kbd { background-color: #333; border: 1px solid #555; border-radius: 3px; padding: 2px 5px; font-size: 0.9em;}
+        #guide-section code { color: var(--warning-color); }
+
     </style>
 </head>
 
@@ -120,59 +141,89 @@
     <div id="messageBox" class="message-box"></div>
     
     <header>
-        <h1>WULYENA-CALESTARA Vault v12.0</h1>
-        <p class="tagline">Lazarus Edition</p>
+        <h1 data-lang-key="main_title">WULYENA-CALESTARA Vault v15.0</h1>
+        <p class="tagline" data-lang-key="tagline">Apex Edition</p>
+        <div class="lang-switcher">
+            <button id="lang-id" class="active">ID</button>
+            <button id="lang-en">EN</button>
+        </div>
     </header>
 
     <main id="main-content">
         <section class="section-container" id="ghost-protocol-panel">
-            <h3>Ghost Protocol: Pesan Sekali Baca</h3>
+            <h3 data-lang-key="ghost_title">Ghost Protocol: Pesan Sekali Baca</h3>
              <div id="ghost-creator-view">
-                <div class="input-group"><label for="ghostMessage">Pesan Rahasia</label><textarea id="ghostMessage" placeholder="Pesan ini akan hancur setelah dibaca..."></textarea></div>
-                <div class="input-group"><label for="ghostPassword">Password</label><input type="password" id="ghostPassword" placeholder="Buat password untuk link ini..."></div>
-                <div class="buttons-group" style="margin-top:1rem;"><button id="ghostGenerateBtn">Generate Ghost Link</button></div>
+                <div class="input-group"><label for="ghostMessage" data-lang-key="ghost_secret_message_label">Pesan Rahasia</label><textarea id="ghostMessage" data-lang-key="ghost_secret_message_placeholder" placeholder="Pesan ini akan hancur setelah dibaca..."></textarea></div>
+                <div class="input-group"><label for="ghostPassword" data-lang-key="ghost_password_label">Password</label><input type="password" id="ghostPassword" data-lang-key="ghost_password_placeholder" placeholder="Buat password untuk link ini..."></div>
+                <div class="buttons-group" style="margin-top:1rem;"><button id="ghostGenerateBtn" data-lang-key="ghost_generate_btn">Generate Ghost Link</button></div>
                 <div class="input-group" id="ghostLinkContainer" style="display:none;">
-                    <label>Ghost Link (Sekali Pakai)</label>
+                    <label data-lang-key="ghost_link_label">Ghost Link (Sekali Pakai)</label>
                     <div id="ghostLinkOutput" style="background-color: var(--input-bg-color); padding:1rem; border-radius:8px; border: 1px solid var(--primary-color); word-wrap: break-word;"></div>
-                    <div class="output-actions"><button id="copyGhostLinkBtn">Salin Link</button></div>
+                    <div class="output-actions"><button id="copyGhostLinkBtn" data-lang-key="copy_link_btn">Salin Link</button></div>
                 </div>
              </div>
              <div id="ghost-reader-view" style="display: none;"></div>
         </section>
 
-        <details class="protocols-expander"><summary>Buka Protokol Enkripsi Lainnya</summary>
+        <details class="protocols-expander"><summary data-lang-key="open_protocols">Buka Protokol Tambahan</summary>
             <section class="section-container">
-                <h3>Standard Cipher Protocol</h3>
-                 <div class="input-group"><label for="inputText">Teks Asli / Cipher</label><textarea id="inputText" placeholder="Ketik pesan rahasia..."></textarea></div>
-                <div class="input-group"><label for="password">Password</label><input type="password" id="password" placeholder="Password enkripsi/dekripsi..."></div>
-                <div class="buttons-group" style="margin-top:1rem;"><button id="encodeButton">Enkripsi</button><button id="decodeButton">Dekripsi</button><button id="stdResetButton" class="danger">Hapus</button></div>
-                <div class="input-group"><label for="outputResult">Hasil</label><div id="outputResult" style="min-height:80px; background-color: var(--input-bg-color); padding:1rem; border-radius:8px; border: 1px solid var(--primary-color);"></div><div class="output-actions"><button id="copyOutputBtn">Salin</button></div></div>
+                <h3 data-lang-key="std_title">Standard Cipher Protocol</h3>
+                 <div class="input-group"><label for="inputText" data-lang-key="std_input_label">Teks Asli / Cipher</label><textarea id="inputText" data-lang-key="std_input_placeholder" placeholder="Ketik pesan rahasia..."></textarea></div>
+                <div class="input-group"><label for="password" data-lang-key="std_password_label">Password</label><input type="password" id="password" data-lang-key="std_password_placeholder" placeholder="Password enkripsi/dekripsi..."></div>
+                <div class="buttons-group" style="margin-top:1rem;"><button id="encodeButton" data-lang-key="encrypt_btn">Enkripsi</button><button id="decodeButton" data-lang-key="decrypt_btn">Dekripsi</button><button id="stdResetButton" class="danger" data-lang-key="reset_btn">Hapus</button></div>
+                <div class="input-group"><label for="outputResult" data-lang-key="result_label">Hasil</label><div id="outputResult" style="min-height:80px; background-color: var(--input-bg-color); padding:1rem; border-radius:8px; border: 1px solid var(--primary-color);"></div><div class="output-actions"><button id="copyOutputBtn" data-lang-key="copy_btn">Salin</button></div></div>
             </section>
             <section class="section-container">
-                <h3>Aegis Protocol</h3>
-                 <div class="input-group"><label for="aegisInput">Pesan Rahasia</label><textarea id="aegisInput" placeholder="Pesan yang akan disamarkan..."></textarea></div>
-                <div class="input-group"><label for="aegisStyle">Gaya Narasi</label><input type="text" id="aegisStyle" placeholder="Contoh: Surat cinta, puisi, dll."></div>
-                <div class="input-group"><label for="aegisPassword">Password Aegis</label><input type="password" id="aegisPassword" placeholder="Password untuk mengunci narasi..."></div>
-                 <div class="input-group"><label for="aegisApiKey">Gemini API Key</label><input type="password" id="aegisApiKey" placeholder="Dapatkan dari Google AI Studio..."></div>
-                <div class="buttons-group" style="margin-top:1rem;"><button id="aegisGenerateAndEncryptButton">Samarkan & Enkripsi</button><button id="aegisDecryptButton">Dekripsi Narasi</button><button id="aegisResetButton" class="danger">Hapus</button></div>
-                 <div class="input-group"><label>Hasil / Ciphertext</label><div id="aegisOutput" style="min-height:80px; background-color: var(--input-bg-color); padding:1rem; border-radius:8px; border: 1px solid var(--primary-color);"></div><div class="output-actions"><button id="copyAegisBtn">Salin</button></div></div>
+                <h3 data-lang-key="aegis_title">Aegis Protocol</h3>
+                 <div class="input-group"><label for="aegisInput" data-lang-key="aegis_secret_label">Pesan Rahasia</label><textarea id="aegisInput" data-lang-key="aegis_secret_placeholder" placeholder="Pesan yang akan disamarkan..."></textarea></div>
+                <div class="input-group"><label for="aegisStyle" data-lang-key="aegis_style_label">Gaya Narasi</label><input type="text" id="aegisStyle" data-lang-key="aegis_style_placeholder" placeholder="Contoh: Surat cinta, puisi, dll."></div>
+                <div class="input-group"><label for="aegisPassword" data-lang-key="aegis_password_label">Password Aegis</label><input type="password" id="aegisPassword" data-lang-key="aegis_password_placeholder" placeholder="Password untuk mengunci narasi..."></div>
+                 <div class="input-group"><label for="aegisApiKey" data-lang-key="aegis_api_key_label">Gemini API Key</label><input type="password" id="aegisApiKey" data-lang-key="aegis_api_key_placeholder" placeholder="Dapatkan dari Google AI Studio..."></div>
+                <div class="buttons-group" style="margin-top:1rem;"><button id="aegisGenerateAndEncryptButton" data-lang-key="aegis_generate_btn">Samarkan & Enkripsi</button><button id="aegisDecryptButton" data-lang-key="aegis_decrypt_btn">Dekripsi Narasi</button><button id="aegisResetButton" class="danger" data-lang-key="reset_btn">Hapus</button></div>
+                 <div class="input-group"><label data-lang-key="result_ciphertext_label">Hasil / Ciphertext</label><div id="aegisOutput" style="min-height:80px; background-color: var(--input-bg-color); padding:1rem; border-radius:8px; border: 1px solid var(--primary-color);"></div><div class="output-actions"><button id="copyAegisBtn" data-lang-key="copy_btn">Salin</button></div></div>
             </section>
+
+            <section class="section-container">
+                <h3 data-lang-key="erebus_title">Erebus Protocol: Generator Kunci</h3>
+                <div class="input-group"><label data-lang-key="erebus_output_label">Kunci Acak yang Dihasilkan</label><div id="erebusOutput" style="background-color: var(--input-bg-color); padding:1rem; border-radius:8px; border: 1px solid var(--primary-color); text-align:center; font-size: 1.1em; letter-spacing: 1px;">-</div><div class="output-actions"><button id="copyErebusBtn" data-lang-key="copy_key_btn">Salin Kunci</button></div></div>
+                <div class="input-group"><label for="erebusLength" data-lang-key="erebus_length_label">Panjang Karakter</label><div class="range-group"><span>8</span><input type="range" id="erebusLength" min="8" max="64" value="16" style="flex-grow:1;"><output for="erebusLength" id="erebusLengthLabel">16</output></div></div>
+                <div class="checkbox-group"><label><input type="checkbox" id="erebusUseNumbers" checked><span data-lang-key="erebus_numbers_label">Sertakan Angka (0-9)</span></label><label><input type="checkbox" id="erebusUseSymbols" checked><span data-lang-key="erebus_symbols_label">Sertakan Simbol (!@#$)</span></label></div>
+                <div class="buttons-group" style="margin-top:1rem;"><button id="erebusGenerateBtn" data-lang-key="erebus_generate_btn">Buat Kunci Baru</button></div>
+            </section>
+
+            <section class="section-container">
+                <h3 data-lang-key="caelus_title">Caelus Protocol: Penyembunyi Teks</h3>
+                <div class="input-group"><label for="caelusSecret" data-lang-key="caelus_secret_label">Pesan Singkat</label><input type="text" id="caelusSecret" data-lang-key="caelus_secret_placeholder" placeholder="Pesan yang akan disembunyikan..."></div>
+                <div class="input-group"><label for="caelusPassword" data-lang-key="caelus_password_label">Password</label><input type="password" id="caelusPassword" data-lang-key="caelus_password_placeholder" placeholder="Password untuk menyembunyikan/menampilkan..."></div>
+                <div class="buttons-group" style="margin-top:1rem;"><button id="caelusHideBtn" data-lang-key="caelus_hide_btn">Sembunyikan</button><button id="caelusRevealBtn" data-lang-key="caelus_reveal_btn">Tampilkan</button></div>
+                <div class="input-group"><label data-lang-key="caelus_junk_label">Teks Sampah (Cipher) / Teks Untuk Diperiksa</label><textarea id="caelusJunkText" data-lang-key="caelus_junk_placeholder" placeholder="Hasil enkripsi akan muncul di sini, atau tempel teks untuk diperiksa..." style="height: 150px;"></textarea><div class="output-actions"><button id="copyCaelusBtn" data-lang-key="copy_all_btn">Salin Semua</button></div></div>
+            </section>
+        </details>
+        
+        <details class="protocols-expander">
+            <summary data-lang-key="guide_title">Panduan Penggunaan</summary>
+            <div id="guide-section">
+                <!-- Content will be added by JS -->
+            </div>
         </details>
     </main>
     
     <footer style="text-align:center; padding:15px; color: #666; background:rgba(0,0,0,0.8); border-top: 1px solid #333; z-index:10;">
-        <p>Lazarus Edition | For Wulyena by Calestara & Gemini</p>
+        <p data-lang-key="footer_text">Apex Edition | For Wulyena by Calestara & Gemini</p>
     </footer>
     
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const vaultApp = {
                 els: {},
+                state: { lang: 'id' },
                 init() {
                     this.cacheElements();
-                    this.setupEventListeners();
                     this.modules.starfield.init.call(this);
                     this.modules.ghost.init.call(this);
+                    this.modules.erebus.init.call(this);
+                    this.modules.language.init.call(this);
+                    this.setupEventListeners();
                 },
                 cacheElements() {
                     const allIds = Array.from(document.querySelectorAll('[id]'));
@@ -183,14 +234,27 @@
                     this.els.decodeButton.addEventListener('click', () => this.modules.standardCipher.decrypt.call(this));
                     this.els.stdResetButton.addEventListener('click', () => this.modules.standardCipher.reset.call(this));
                     this.els.copyOutputBtn.addEventListener('click', (e) => this.copyToClipboard(this.els.outputResult.textContent, e.target));
+                    
                     this.els.ghostGenerateBtn.addEventListener('click', () => this.modules.ghost.generateLink.call(this));
+                    
                     this.els.aegisGenerateAndEncryptButton.addEventListener('click', () => this.modules.aegis.generateAndEncrypt.call(this));
                     this.els.aegisDecryptButton.addEventListener('click', () => this.modules.aegis.decrypt.call(this));
                     this.els.aegisResetButton.addEventListener('click', () => this.modules.aegis.reset.call(this));
                     this.els.copyAegisBtn.addEventListener('click', (e) => this.copyToClipboard(this.els.aegisOutput.textContent, e.target));
+
+                    this.els.erebusGenerateBtn.addEventListener('click', () => this.modules.erebus.generate.call(this));
+                    this.els.copyErebusBtn.addEventListener('click', (e) => this.copyToClipboard(this.els.erebusOutput.textContent, e.target));
+                    this.els.erebusLength.addEventListener('input', () => this.els.erebusLengthLabel.textContent = this.els.erebusLength.value);
+                    
+                    this.els.caelusHideBtn.addEventListener('click', () => this.modules.caelus.hide.call(this));
+                    this.els.caelusRevealBtn.addEventListener('click', () => this.modules.caelus.reveal.call(this));
+                    this.els.copyCaelusBtn.addEventListener('click', (e) => this.copyToClipboard(this.els.caelusJunkText.value, e.target));
+                    
+                    this.els.langId.addEventListener('click', () => this.modules.language.setLanguage.call(this, 'id'));
+                    this.els.langEn.addEventListener('click', () => this.modules.language.setLanguage.call(this, 'en'));
                 },
                 copyToClipboard(text, buttonElement) {
-                    if (!text || text.trim() === '') return this.showMessage("Tidak ada yang bisa disalin.", "error");
+                    if (!text || text.trim() === '' || text === '-') return this.showMessage(this.modules.language.translations[this.state.lang].nothing_to_copy, "error");
                     const textArea = document.createElement("textarea");
                     textArea.value = text;
                     textArea.style.position = "fixed"; textArea.style.left = "-9999px";
@@ -199,10 +263,10 @@
                     try {
                         document.execCommand('copy');
                         const originalText = buttonElement.textContent;
-                        buttonElement.textContent = 'Tersalin!';
+                        buttonElement.textContent = this.modules.language.translations[this.state.lang].copied;
                         buttonElement.disabled = true;
                         setTimeout(() => { buttonElement.textContent = originalText; buttonElement.disabled = false; }, 2000);
-                    } catch (err) { this.showMessage("Gagal menyalin.", "error"); }
+                    } catch (err) { this.showMessage(this.modules.language.translations[this.state.lang].copy_failed, "error"); }
                     document.body.removeChild(textArea);
                 },
                 showMessage(message, type = 'info', duration = 4000) {
@@ -250,11 +314,7 @@
                              const setup = () => {
                                 canvas.width = window.innerWidth;
                                 canvas.height = window.innerHeight;
-                                stars = Array.from({ length: 300 }, () => ({
-                                    x: Math.random() * canvas.width, y: Math.random() * canvas.height,
-                                    radius: Math.random() * 1.5, alpha: Math.random(),
-                                    alphaChange: (Math.random() * 0.02) - 0.01
-                                }));
+                                stars = Array.from({ length: 300 }, () => ({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, radius: Math.random() * 1.5, alpha: Math.random(), alphaChange: (Math.random() * 0.02) - 0.01 }));
                              };
                              const draw = () => {
                                 ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -284,100 +344,311 @@
                             }
                         },
                         renderReaderView(hash) {
+                            const lang = this.state.lang || 'id';
+                            const readerText = this.modules.language.translations[lang].ghost_reader;
                             this.els.ghostReaderView.innerHTML = `
                                 <div class="self-destruct-message">
-                                    <p>GHOST PROTOCOL: PESAN MASUK</p>
-                                    <span>Sebuah pesan terenkripsi terdeteksi. Masukkan password untuk membukanya. Pesan ini akan hancur setelah halaman ditutup.</span>
-                                    <div class="input-group"><input type="password" id="ghostReaderPassword" placeholder="Masukkan password untuk membaca..."></div>
-                                    <div class="buttons-group"><button id="ghostRevealBtn">Buka Pesan</button></div>
+                                    <p>${readerText.title}</p>
+                                    <span>${readerText.description}</span>
+                                    <div class="input-group"><input type="password" id="ghostReaderPassword" placeholder="${readerText.placeholder}"></div>
+                                    <div class="buttons-group"><button id="ghostRevealBtn">${readerText.button}</button></div>
                                 </div>`;
                             document.getElementById('ghostRevealBtn').addEventListener('click', () => this.modules.ghost.revealMessage.call(this, hash));
                         },
                         async revealMessage(hash) {
                             const password = document.getElementById('ghostReaderPassword').value;
-                            if (!password) return this.showMessage("Password wajib diisi.", "error");
+                            if (!password) return this.showMessage(this.modules.language.translations[this.state.lang].password_required, "error");
                             try {
                                 const decryptedMessage = await this.cryptoCore.decryptSingle(atob(hash), password);
+                                const revealedText = this.modules.language.translations[this.state.lang].ghost_revealed;
                                 this.els.ghostReaderView.innerHTML = `
                                 <div class="self-destruct-message">
-                                    <p>PESAN TELAH DIBUKA</p>
+                                    <p>${revealedText.title}</p>
                                     <div class="message-content">${decryptedMessage.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
-                                    <span>Pesan ini telah hancur. Salin sekarang atau akan hilang selamanya.</span>
-                                    <div class="output-actions"><button id="copyGhostMessageBtn">Salin Pesan</button></div>
+                                    <span>${revealedText.description}</span>
+                                    <div class="output-actions"><button id="copyGhostMessageBtn">${revealedText.button}</button></div>
                                 </div>`;
                                 document.getElementById('copyGhostMessageBtn').addEventListener('click', (e) => this.copyToClipboard(decryptedMessage, e.target));
                                 history.replaceState(null, null, ' ');
                             } catch (e) {
-                                this.showMessage("Dekripsi gagal: Password salah atau link rusak.", "error");
-                                this.els.ghostReaderView.innerHTML = `<div class="self-destruct-message"><p style="color:var(--danger-color)">DEKRIPSI GAGAL</p><span style="color:var(--danger-color);">Password salah. Link ini telah rusak dan pesan di dalamnya hancur.</span></div>`;
+                                this.showMessage(this.modules.language.translations[this.state.lang].decrypt_fail, "error");
+                                const failedText = this.modules.language.translations[this.state.lang].ghost_failed;
+                                this.els.ghostReaderView.innerHTML = `<div class="self-destruct-message"><p style="color:var(--danger-color)">${failedText.title}</p><span style="color:var(--danger-color);">${failedText.description}</span></div>`;
                                 history.replaceState(null, null, ' ');
                             }
                         },
                         async generateLink() {
                             const { ghostMessage, ghostPassword, ghostLinkContainer, ghostLinkOutput } = this.els;
-                            if (!ghostMessage.value || !ghostPassword.value) return this.showMessage("Pesan dan Password wajib diisi.", "error");
+                            if (!ghostMessage.value || !ghostPassword.value) return this.showMessage(this.modules.language.translations[this.state.lang].ghost_error, "error");
                             try {
                                 const ciphertext = await this.cryptoCore.encryptSingle(ghostMessage.value, ghostPassword.value);
                                 const payload = btoa(ciphertext);
                                 const finalLink = `${window.location.href.split('#')[0]}#${payload}`;
                                 ghostLinkOutput.textContent = finalLink;
                                 ghostLinkContainer.style.display = 'block';
-                                if (!document.getElementById('copyGhostLinkBtn')) {
-                                    const copyBtn = document.createElement('button');
-                                    copyBtn.id = 'copyGhostLinkBtn';
-                                    copyBtn.textContent = 'Salin Link';
-                                    this.els.ghostLinkContainer.querySelector('.output-actions').appendChild(copyBtn);
-                                }
                                 document.getElementById('copyGhostLinkBtn').onclick = (e) => this.copyToClipboard(finalLink, e.target);
-                                this.showMessage("Ghost Link berhasil dibuat!", "success");
-                            } catch (e) { this.showMessage("Gagal membuat link.", "error"); }
+                                this.showMessage(this.modules.language.translations[this.state.lang].ghost_success, "success");
+                            } catch (e) { this.showMessage(this.modules.language.translations[this.state.lang].generic_fail, "error"); }
                         }
                     },
                     standardCipher: {
                         reset() { this.els.inputText.value = ''; this.els.password.value = ''; this.els.outputResult.textContent = ''; },
-                        async encrypt() {
-                            if (!this.els.inputText.value || !this.els.password.value) return this.showMessage("Teks dan Password wajib diisi.", "error");
-                            try {
-                                this.els.outputResult.textContent = await this.cryptoCore.encryptSingle(this.els.inputText.value, this.els.password.value);
-                                this.showMessage("Enkripsi berhasil.", "success");
-                            } catch(e) { this.showMessage("Enkripsi gagal.", "error"); }
-                        },
-                        async decrypt() {
-                            if (!this.els.inputText.value || !this.els.password.value) return this.showMessage("Ciphertext dan Password wajib diisi.", "error");
-                            try {
-                                this.els.outputResult.textContent = await this.cryptoCore.decryptSingle(this.els.inputText.value, this.els.password.value);
-                                this.showMessage("Dekripsi berhasil.", "success");
-                            } catch (e) { this.showMessage("Dekripsi gagal: Password salah atau data korup.", "error"); }
-                        }
+                        async encrypt() { if (!this.els.inputText.value || !this.els.password.value) return this.showMessage(this.modules.language.translations[this.state.lang].std_error, "error"); try { this.els.outputResult.textContent = await this.cryptoCore.encryptSingle(this.els.inputText.value, this.els.password.value); this.showMessage(this.modules.language.translations[this.state.lang].encrypt_success, "success"); } catch(e) { this.showMessage(this.modules.language.translations[this.state.lang].encrypt_fail, "error"); }},
+                        async decrypt() { if (!this.els.inputText.value || !this.els.password.value) return this.showMessage(this.modules.language.translations[this.state.lang].std_error, "error"); try { this.els.outputResult.textContent = await this.cryptoCore.decryptSingle(this.els.inputText.value, this.els.password.value); this.showMessage(this.modules.language.translations[this.state.lang].decrypt_success, "success"); } catch (e) { this.showMessage(this.modules.language.translations[this.state.lang].decrypt_fail, "error"); }}
                     },
                     aegis: {
                         reset() { this.els.aegisInput.value = ''; this.els.aegisStyle.value = ''; this.els.aegisPassword.value = ''; this.els.aegisApiKey.value = ''; this.els.aegisOutput.textContent = ''; },
                         async generateAndEncrypt() {
                              const { aegisInput, aegisStyle, aegisPassword, aegisApiKey, aegisOutput } = this.els;
-                             if (!aegisInput.value || !aegisStyle.value || !aegisPassword.value || !aegisApiKey.value) return this.showMessage("Semua kolom Aegis wajib diisi.", "error");
-                             aegisOutput.innerHTML = '<div class="nyx-system-message">Menghubungi AI...</div>';
-                             const prompt = `Ubah pesan rahasia berikut: "${aegisInput.value}" menjadi sebuah narasi puitis dengan gaya: "${aegisStyle.value}". Jangan sebutkan pesan aslinya.`;
+                             if (!aegisInput.value || !aegisStyle.value || !aegisPassword.value || !aegisApiKey.value) return this.showMessage(this.modules.language.translations[this.state.lang].aegis_error, "error");
+                             aegisOutput.innerHTML = `<div style="text-align:center; color: var(--info-color);">${this.modules.language.translations[this.state.lang].aegis_contacting}</div>`;
+                             const prompt = `Disguise the following secret message: "${aegisInput.value}" as a narrative with the style: "${aegisStyle.value}". Do not mention the original message.`;
                              try {
                                 const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
-                                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${aegisApiKey.value}`, {
-                                     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
-                                });
-                                if (!response.ok) throw new Error(`AI Gagal merespon. Status: ${response.status}`);
+                                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${aegisApiKey.value}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                                if (!response.ok) throw new Error(`AI Response Failed. Status: ${response.status}`);
                                 const result = await response.json();
                                 const poem = result.candidates[0].content.parts[0].text.trim();
-                                aegisOutput.innerHTML = '<div class="nyx-system-message">Mengenkripsi narasi...</div>';
+                                aegisOutput.innerHTML = `<div style="text-align:center; color: var(--info-color);">${this.modules.language.translations[this.state.lang].aegis_encrypting}</div>`;
                                 const ciphertext = await this.cryptoCore.encryptSingle(poem, aegisPassword.value);
                                 aegisOutput.textContent = ciphertext;
-                                this.showMessage("Narasi berhasil dibuat & dienkripsi!", "success");
-                            } catch (e) { this.showMessage(`Error Aegis: ${e.message}`, "error"); aegisOutput.textContent = ''; }
+                                this.showMessage(this.modules.language.translations[this.state.lang].aegis_success, "success");
+                            } catch (e) { this.showMessage(`Aegis Error: ${e.message}`, "error"); aegisOutput.textContent = ''; }
                         },
                         async decrypt() {
                             const { aegisOutput, aegisPassword } = this.els;
-                            if (!aegisOutput.textContent || !aegisPassword.value) return this.showMessage("Ciphertext dan Password Aegis wajib diisi.", "error");
+                            if (!aegisOutput.textContent || !aegisPassword.value) return this.showMessage(this.modules.language.translations[this.state.lang].aegis_decrypt_error, "error");
                             try {
                                 const decrypted = await this.cryptoCore.decryptSingle(aegisOutput.textContent, aegisPassword.value);
                                 aegisOutput.textContent = decrypted;
-                            } catch(e) { this.showMessage("Dekripsi Aegis gagal.", "error"); }
+                            } catch(e) { this.showMessage(this.modules.language.translations[this.state.lang].aegis_decrypt_fail, "error"); }
+                        }
+                    },
+                    erebus: {
+                        init() { this.modules.erebus.generate.call(this); },
+                        generate() {
+                            const { erebusLength, erebusUseNumbers, erebusUseSymbols, erebusOutput } = this.els;
+                            const length = parseInt(erebusLength.value, 10);
+                            let charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                            if (erebusUseNumbers.checked) charset += "0123456789";
+                            if (erebusUseSymbols.checked) charset += "!@#$%^&*()_+-=[]{}|;:,.<>/?";
+                            let password = "";
+                            for (let i = 0; i < length; i++) { password += charset.charAt(Math.floor(Math.random() * charset.length)); }
+                            erebusOutput.textContent = password;
+                        }
+                    },
+                    caelus: {
+                        async hide() {
+                            const { caelusSecret, caelusPassword, caelusJunkText } = this.els;
+                            if (!caelusSecret.value || !caelusPassword.value) return this.showMessage(this.modules.language.translations[this.state.lang].caelus_error, "error");
+                            try {
+                                const ciphertext = await this.cryptoCore.encryptSingle(caelusSecret.value, caelusPassword.value);
+                                caelusJunkText.value = ciphertext;
+                                this.showMessage(this.modules.language.translations[this.state.lang].caelus_hide_success, "success");
+                            } catch(e) { this.showMessage(this.modules.language.translations[this.state.lang].caelus_hide_fail, "error"); }
+                        },
+                        async reveal() {
+                            const { caelusJunkText, caelusPassword } = this.els;
+                            if (!caelusJunkText.value || !caelusPassword.value) return this.showMessage(this.modules.language.translations[this.state.lang].caelus_reveal_error, "error");
+                            try {
+                                const decrypted = await this.cryptoCore.decryptSingle(caelusJunkText.value, caelusPassword.value);
+                                this.showMessage(`${this.modules.language.translations[this.state.lang].caelus_reveal_success}: ${decrypted}`, "success", 8000);
+                                caelusJunkText.value = decrypted; 
+                            } catch(e) { this.showMessage(this.modules.language.translations[this.state.lang].caelus_reveal_fail, "error"); }
+                        }
+                    },
+                     language: {
+                        translations: {
+                            'id': {
+                                main_title: "WULYENA-CALESTARA Vault v15.0", tagline: 'Apex Edition',
+                                ghost_title: 'Ghost Protocol: Pesan Sekali Baca',
+                                ghost_secret_message_label: 'Pesan Rahasia',
+                                ghost_secret_message_placeholder: 'Pesan ini akan hancur setelah dibaca...',
+                                ghost_password_label: 'Password',
+                                ghost_password_placeholder: 'Buat password untuk link ini...',
+                                ghost_generate_btn: 'Generate Ghost Link',
+                                ghost_link_label: 'Ghost Link (Sekali Pakai)',
+                                copy_link_btn: 'Salin Link',
+                                open_protocols: 'Buka Protokol Tambahan',
+                                std_title: 'Standard Cipher Protocol',
+                                std_input_label: 'Teks Asli / Cipher',
+                                std_input_placeholder: 'Ketik pesan rahasia...',
+                                std_password_label: 'Password',
+                                std_password_placeholder: 'Password enkripsi/dekripsi...',
+                                encrypt_btn: 'Enkripsi', decrypt_btn: 'Dekripsi', reset_btn: 'Hapus',
+                                result_label: 'Hasil', copy_btn: 'Salin', aegis_title: 'Aegis Protocol',
+                                aegis_secret_label: 'Pesan Rahasia', aegis_secret_placeholder: 'Pesan yang akan disamarkan...',
+                                aegis_style_label: 'Gaya Narasi', aegis_style_placeholder: 'Contoh: Surat cinta, puisi, dll.',
+                                aegis_password_label: 'Password Aegis', aegis_password_placeholder: 'Password untuk mengunci narasi...',
+                                aegis_api_key_label: 'Gemini API Key', aegis_api_key_placeholder: 'Dapatkan dari Google AI Studio...',
+                                aegis_generate_btn: 'Samarkan & Enkripsi', aegis_decrypt_btn: 'Dekripsi Narasi',
+                                result_ciphertext_label: 'Hasil / Ciphertext',
+                                erebus_title: 'Erebus Protocol: Generator Kunci',
+                                erebus_output_label: 'Kunci Acak yang Dihasilkan',
+                                copy_key_btn: 'Salin Kunci',
+                                erebus_length_label: 'Panjang Karakter',
+                                erebus_numbers_label: 'Sertakan Angka (0-9)',
+                                erebus_symbols_label: 'Sertakan Simbol (!@#$)',
+                                erebus_generate_btn: 'Buat Kunci Baru',
+                                caelus_title: 'Caelus Protocol: Penyembunyi Teks',
+                                caelus_secret_label: 'Pesan Singkat',
+                                caelus_secret_placeholder: 'Pesan yang akan disembunyikan...',
+                                caelus_password_label: 'Password',
+                                caelus_password_placeholder: 'Password untuk menyembunyikan/menampilkan...',
+                                caelus_hide_btn: 'Sembunyikan', caelus_reveal_btn: 'Tampilkan',
+                                caelus_junk_label: 'Teks Sampah (Cipher) / Teks Untuk Diperiksa',
+                                caelus_junk_placeholder: 'Hasil enkripsi akan muncul di sini...',
+                                copy_all_btn: 'Salin Semua',
+                                footer_text: 'Apex Edition | For Wulyena by Calestara & Gemini',
+                                copied: 'Tersalin!', nothing_to_copy: "Tidak ada yang bisa disalin.", copy_failed: "Gagal menyalin.",
+                                password_required: "Password wajib diisi.",
+                                std_error: "Teks dan Password wajib diisi.",
+                                encrypt_success: "Enkripsi berhasil.", encrypt_fail: "Enkripsi gagal.",
+                                decrypt_success: "Dekripsi berhasil.", decrypt_fail: "Dekripsi gagal: Password salah atau data korup.",
+                                aegis_error: "Semua kolom Aegis wajib diisi.", aegis_contacting: "Menghubungi AI...", aegis_encrypting: "Mengenkripsi narasi...",
+                                aegis_success: "Narasi berhasil dibuat & dienkripsi!", aegis_decrypt_error: "Ciphertext dan Password Aegis wajib diisi.", aegis_decrypt_fail: "Dekripsi Aegis gagal.",
+                                ghost_error: "Pesan dan Password wajib diisi.", ghost_success: "Ghost Link berhasil dibuat!",
+                                caelus_error: "Pesan Singkat dan Password wajib diisi.", caelus_hide_success: "Pesan berhasil dienkripsi.", caelus_hide_fail: "Gagal menyembunyikan pesan.",
+                                caelus_reveal_error: "Teks Cipher dan Password wajib diisi.", caelus_reveal_success: "Pesan Terungkap", caelus_reveal_fail: "Gagal menampilkan pesan: Password salah atau teks bukan cipher yang valid.",
+                                guide_title: "Panduan Penggunaan",
+                                ghost_reader: { title: "GHOST PROTOCOL: PESAN MASUK", description: "Sebuah pesan terenkripsi terdeteksi. Masukkan password untuk membukanya. Pesan ini akan hancur setelah halaman ditutup.", placeholder: "Masukkan password untuk membaca...", button: "Buka Pesan" },
+                                ghost_revealed: { title: "PESAN TELAH DIBUKA", description: "Pesan ini telah hancur. Salin sekarang atau akan hilang selamanya.", button: "Salin Pesan"},
+                                ghost_failed: { title: "DEKRIPSI GAGAL", description: "Password salah. Link ini telah rusak dan pesan di dalamnya hancur."},
+                                guide_content: {
+                                    ghost: { title: "Ghost Protocol (Pesan Sekali Baca)", description: "Gunakan ini untuk mengirim pesan yang paling sensitif. Penerima hanya punya satu kesempatan untuk membaca. Setelah link dibuka dan halaman ditutup, pesan akan hancur selamanya dan link menjadi tidak valid.", steps: ["Masukkan pesan rahasia dan buat password.", "Klik <code>Generate Ghost Link</code>.", "Salin link yang muncul dan kirim ke penerima.", "Berikan password melalui jalur yang berbeda (telepon, chat lain, dll)."] },
+                                    standard: { title: "Standard Cipher Protocol", description: "Gunakan ini untuk mengenkripsi atau mendekripsi teks biasa dengan cepat menggunakan password. Hasilnya adalah teks acak (ciphertext) yang bisa Anda salin dan tempel di mana saja." },
+                                    aegis: { title: "Aegis Protocol (AI Sastra)", description: "Ini adalah alat penyamaran tingkat tinggi. Aegis akan meminta AI untuk mengubah pesan rahasia Anda menjadi puisi atau narasi, lalu mengenkripsinya. Membutuhkan Gemini API Key dari Google AI Studio.", steps: ["Masukkan pesan rahasia yang ingin disamarkan.", "Tulis gaya narasi yang Anda inginkan (contoh: \"surat cinta dari masa depan\").", "Masukkan password dan Gemini API Key Anda.", "Klik <code>Samarkan & Enkripsi</code> untuk mendapatkan hasilnya."] },
+                                    erebus: { title: "Erebus Protocol (Generator Kunci)", description: "Gunakan ini jika Anda kesulitan membuat password yang kuat. Atur panjangnya, pilih opsi angka/simbol, lalu klik <code>Buat Kunci Baru</code>. Salin kunci yang dihasilkan untuk digunakan di protokol lain." },
+                                    caelus: { title: "Caelus Protocol (Penyembunyi Teks)", description: "Menyembunyikan pesan singkat Anda dengan cara mengenkripsinya menjadi sebuah blok teks acak yang panjang. Ini bukan menyembunyikan di dalam teks lain, melainkan membuat pesan Anda sendiri terlihat seperti \"sampah data\" yang terenkripsi.", steps: ["Untuk Menyembunyikan: Masukkan pesan singkat dan password, lalu klik <code>Sembunyikan</code>.", "Untuk Menampilkan: Tempel teks acak (cipher) di kotak teks, masukkan password yang benar, lalu klik <code>Tampilkan</code>."]}
+                                }
+                            },
+                            'en': {
+                                main_title: "WULYENA-CALESTARA Vault v15.0",
+                                tagline: 'Apex Edition',
+                                ghost_title: 'Ghost Protocol: One-Time Message',
+                                ghost_secret_message_label: 'Secret Message',
+                                ghost_secret_message_placeholder: 'This message will self-destruct after being read...',
+                                ghost_password_label: 'Password',
+                                ghost_password_placeholder: 'Create a password for this link...',
+                                ghost_generate_btn: 'Generate Ghost Link',
+                                ghost_link_label: 'Ghost Link (One-Time Use)',
+                                copy_link_btn: 'Copy Link',
+                                open_protocols: 'Open Additional Protocols',
+                                std_title: 'Standard Cipher Protocol',
+                                std_input_label: 'Plaintext / Ciphertext',
+                                std_input_placeholder: 'Type your secret message...',
+                                std_password_label: 'Password',
+                                std_password_placeholder: 'Password for encryption/decryption...',
+                                encrypt_btn: 'Encrypt',
+                                decrypt_btn: 'Decrypt',
+                                reset_btn: 'Reset',
+                                result_label: 'Result',
+                                copy_btn: 'Copy',
+                                aegis_title: 'Aegis Protocol',
+                                aegis_secret_label: 'Secret Message',
+                                aegis_secret_placeholder: 'The message to be disguised...',
+                                aegis_style_label: 'Narrative Style',
+                                aegis_style_placeholder: 'e.g., Love letter, poem, etc.',
+                                aegis_password_label: 'Aegis Password',
+                                aegis_password_placeholder: 'Password to lock the narrative...',
+                                aegis_api_key_label: 'Gemini API Key',
+                                aegis_api_key_placeholder: 'Get from Google AI Studio...',
+                                aegis_generate_btn: 'Disguise & Encrypt',
+                                aegis_decrypt_btn: 'Decrypt Narrative',
+                                result_ciphertext_label: 'Result / Ciphertext',
+                                erebus_title: 'Erebus Protocol: Key Generator',
+                                erebus_output_label: 'Generated Random Key',
+                                copy_key_btn: 'Copy Key',
+                                erebus_length_label: 'Character Length',
+                                erebus_numbers_label: 'Include Numbers (0-9)',
+                                erebus_symbols_label: 'Include Symbols (!@#$)',
+                                erebus_generate_btn: 'Generate New Key',
+                                caelus_title: 'Caelus Protocol: Text Obfuscator',
+                                caelus_secret_label: 'Short Message',
+                                caelus_secret_placeholder: 'The message to be hidden...',
+                                caelus_password_label: 'Password',
+                                caelus_password_placeholder: 'Password to hide/reveal...',
+                                caelus_hide_btn: 'Obfuscate',
+                                caelus_reveal_btn: 'Reveal',
+                                caelus_junk_label: 'Junk Text (Cipher) / Text to Inspect',
+                                caelus_junk_placeholder: 'Obfuscated text will appear here...',
+                                copy_all_btn: 'Copy All',
+                                footer_text: 'Apex Edition | For Wulyena by Calestara & Gemini',
+                                copied: 'Copied!',
+                                nothing_to_copy: "Nothing to copy.",
+                                copy_failed: "Copy failed.",
+                                password_required: "Password is required.",
+                                std_error: "Text and Password are required.",
+                                encrypt_success: "Encryption successful.",
+                                encrypt_fail: "Encryption failed.",
+                                decrypt_success: "Decryption successful.",
+                                decrypt_fail: "Decryption failed: Wrong password or corrupted data.",
+                                aegis_error: "All Aegis fields are required.",
+                                aegis_contacting: "Contacting AI...",
+                                aegis_encrypting: "Encrypting narrative...",
+                                aegis_success: "Narrative created & encrypted!",
+                                aegis_decrypt_error: "Ciphertext and Aegis Password are required.",
+                                aegis_decrypt_fail: "Aegis decryption failed.",
+                                ghost_error: "Message and Password are required.",
+                                ghost_success: "Ghost Link generated successfully!",
+                                caelus_error: "Short Message and Password are required.",
+                                caelus_hide_success: "Message successfully obfuscated.",
+                                caelus_hide_fail: "Failed to obfuscate message.",
+                                caelus_reveal_error: "Ciphertext and Password are required.",
+                                caelus_reveal_success: "Message Revealed",
+                                caelus_reveal_fail: "Failed to reveal message: Wrong password or invalid ciphertext.",
+                                guide_title: "User Guide",
+                                ghost_reader: { title: "GHOST PROTOCOL: INCOMING MESSAGE", description: "An encrypted message was detected. Enter the password to decrypt it. This message will be destroyed once the page is closed.", placeholder: "Enter password to read...", button: "Reveal Message" },
+                                ghost_revealed: { title: "MESSAGE REVEALED", description: "This message has been destroyed. Copy it now or it will be lost forever.", button: "Copy Message"},
+                                ghost_failed: { title: "DECRYPTION FAILED", description: "The password was incorrect. This link is now corrupted and the message is destroyed."},
+                                guide_content: {
+                                    ghost: { title: "Ghost Protocol (One-Time Message)", description: "Use this to send your most sensitive messages. The recipient has only one chance to read it. Once the link is opened and the page is closed, the message is destroyed forever and the link becomes invalid.", steps: ["Enter the secret message and create a password.", "Click <code>Generate Ghost Link</code>.", "Copy the resulting link and send it to the recipient.", "Provide the password through a different channel (phone, another chat, etc.)."] },
+                                    standard: { title: "Standard Cipher Protocol", description: "Use this to quickly encrypt or decrypt plain text using a password. The result is a random-looking text (ciphertext) that you can copy and paste anywhere." },
+                                    aegis: { title: "Aegis Protocol (AI Narrative)", description: "This is a high-level disguise tool. Aegis will ask an AI to turn your secret message into a poem or narrative, then encrypt it. Requires a Gemini API Key from Google AI Studio.", steps: ["Enter the secret message to be disguised.", "Write the desired narrative style (e.g., \"a love letter from the future\").", "Enter your password and your Gemini API Key.", "Click <code>Disguise & Encrypt</code> to get the result."] },
+                                    erebus: { title: "Erebus Protocol (Key Generator)", description: "Use this if you have trouble creating strong passwords. Set the length, choose the number/symbol options, then click <code>Generate New Key</code>. Copy the resulting key to use in other protocols." },
+                                    caelus: { title: "Caelus Protocol (Text Obfuscator)", description: "Hides your short message by encrypting it into a block of random-looking text. It does not hide it within other text, but rather makes your message itself look like encrypted data 'junk'.", steps: ["To Hide: Enter a short message and a password, then click <code>Obfuscate</code>.", "To Reveal: Paste the junk text (cipher) into the box, enter the correct password, then click <code>Reveal</code>."]}
+                                }
+                            }
+                        },
+                        init() {
+                            const savedLang = localStorage.getItem('wulyena-calestara-vault-lang') || 'id';
+                            this.modules.language.setLanguage.call(this, savedLang);
+                        },
+                        setLanguage(lang) {
+                            this.state.lang = lang;
+                            localStorage.setItem('wulyena-calestara-vault-lang', lang);
+                            this.els.langId.classList.toggle('active', lang === 'id');
+                            this.els.langEn.classList.toggle('active', lang === 'en');
+                            document.documentElement.lang = lang;
+                            const elements = document.querySelectorAll('[data-lang-key]');
+                            elements.forEach(el => {
+                                const key = el.dataset.langKey;
+                                const translation = this.modules.language.translations[lang][key];
+                                if (translation !== undefined) {
+                                    if(el.placeholder !== undefined) { el.placeholder = translation; } 
+                                    else { el.textContent = translation; }
+                                }
+                            });
+                            this.modules.language.populateGuide.call(this);
+                            const hash = window.location.hash.substring(1);
+                            if (hash && this.els.ghostReaderView.style.display !== 'none') {
+                                this.modules.ghost.renderReaderView.call(this, hash);
+                            }
+                        },
+                        populateGuide() {
+                            const guideContent = this.modules.language.translations[this.state.lang].guide_content;
+                            let html = '';
+                            for (const key in guideContent) {
+                                html += `<h4>${guideContent[key].title}</h4><p>${guideContent[key].description}</p>`;
+                                if (guideContent[key].steps) {
+                                    html += '<ol>';
+                                    guideContent[key].steps.forEach(step => {
+                                        html += `<li>${step.replace(/<code>/g, '<kbd>').replace(/<\/code>/g, '</kbd>')}</li>`;
+                                    });
+                                    html += '</ol>';
+                                }
+                            }
+                            this.els.guideSection.innerHTML = html;
                         }
                     }
                 }
