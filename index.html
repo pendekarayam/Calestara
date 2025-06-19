@@ -1,10 +1,10 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OBSIDIAN-Vault v10.0: Cerebrus Edition</title>
+    <title>WULYENA-CALESTARA Vault v12.0: Lazarus Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -24,9 +24,7 @@
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes subtle-glow-pulse { 0%, 100% { box-shadow: 0 0 15px -5px var(--secondary-color); border-color: var(--secondary-color); } 50% { box-shadow: 0 0 25px -5px var(--secondary-color); border-color: var(--secondary-color); } }
-        @keyframes pulse-green { 0%, 100% { box-shadow: 0 0 12px var(--success-color); } 50% { box-shadow: 0 0 20px var(--success-color); } }
-        @keyframes pulse-red { 0%, 100% { box-shadow: 0 0 12px var(--danger-color); } 50% { box-shadow: 0 0 20px var(--danger-color); } }
-
+        
         body {
             font-family: 'Fira Code', 'Courier New', monospace;
             background-color: var(--bg-color); color: var(--text-color);
@@ -43,16 +41,14 @@
             position: sticky; top: 0; z-index: 1000;
         }
         header h1 {
-            font-size: clamp(1.5em, 5vw, 2.5em); color: var(--primary-color);
+            font-size: clamp(1.5em, 5vw, 2.2em); color: var(--primary-color);
             text-shadow: 0 0 12px var(--primary-color), 0 0 25px var(--primary-color);
             margin: 0 0 0.5rem; letter-spacing: 2px;
         }
         
         main {
-            flex-grow: 1; max-width: 1000px; width: 90%; margin: 2rem auto; padding: 1.5rem;
-            background: var(--main-bg-color); backdrop-filter: blur(10px);
-            border-radius: 10px; border: 1px solid var(--primary-color);
-            box-shadow: 0 0 30px -10px var(--primary-color); animation: fadeIn 1s ease-out; z-index: 10;
+            flex-grow: 1; max-width: 1000px; width: 90%; margin: 2rem auto; padding: 0.5rem;
+            background: transparent; border: none; box-shadow: none;
         }
 
         .section-container {
@@ -66,9 +62,25 @@
             padding-bottom: 1rem; margin-top: 0; margin-bottom: 1rem; text-shadow: 0 0 8px var(--primary-color);
             font-size: clamp(1.2em, 4vw, 1.5em);
         }
+        
+        .protocols-expander {
+            border: 1px solid var(--primary-color); border-radius: 10px;
+            background: var(--main-bg-color); backdrop-filter: blur(10px);
+             margin-bottom: 2rem;
+             padding: 1rem;
+        }
+        .protocols-expander summary { cursor: pointer; color: var(--primary-color); text-align: center;  padding: 0.75rem; border-radius: 8px; transition: background-color 0.3s ease; display: flex; justify-content: center; align-items: center; gap: 0.5rem; font-size: 1.2em;}
+        .protocols-expander summary:hover { background-color: rgba(0, 255, 204, 0.1); }
+        .protocols-expander summary::after { content: '▼'; display: inline-block; transition: transform 0.3s ease-out; margin-left: 10px; }
+        .protocols-expander[open] > summary::after { transform: rotate(-180deg); }
+        .protocols-expander[open] > .section-container { margin-top: 2rem; }
+        .protocols-expander .section-container { animation: none; }
 
         .input-group { display: flex; flex-direction: column; gap: 0.5rem; }
         .input-group label { color: var(--secondary-color); font-size: 1.1em; text-shadow: 0 0 4px var(--secondary-color); }
+        .output-actions { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.5rem; }
+        .output-actions button { background: var(--input-bg-color); color: var(--primary-color); border: 1px solid var(--primary-color); padding: 0.25rem 0.75rem; font-size: 0.8em; text-transform: none; border-radius: 5px; }
+
         textarea, input[type="password"], input[type="text"] {
             width: 100%; padding: 1rem; border: 1px solid var(--primary-color);
             border-radius: 8px; background-color: var(--input-bg-color);
@@ -76,6 +88,7 @@
             box-shadow: inset 0 0 8px -2px var(--primary-color); outline: none;
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
+        textarea { min-height: 120px; resize: vertical; }
         textarea:focus, input:focus { border-color: var(--secondary-color); box-shadow: inset 0 0 10px -2px var(--secondary-color), 0 0 15px -5px var(--secondary-color); }
 
         .buttons-group { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
@@ -92,53 +105,13 @@
         button.danger { background-color: var(--danger-color); color: white; box-shadow: 0 0 15px var(--danger-color); }
         button.danger:hover { background-color: #ff0000; box-shadow: 0 0 25px #ff0000; }
         
-        /* --- NYX PROTOCOL STYLES --- */
-        #nyxChatWindow {
-            background-color: var(--input-bg-color); border: 1px solid var(--primary-color);
-            border-radius: 8px; height: 350px; overflow-y: auto; padding: 1rem;
-            display: flex; flex-direction: column; gap: 0.75rem;
-        }
-        .nyx-message { padding: 0.5rem 1rem; border-radius: 15px; max-width: 80%; word-wrap: break-word; line-height: 1.4; animation: fadeIn 0.3s ease-out; }
-        .nyx-message.self { background-color: var(--primary-color); color: #000; border-bottom-right-radius: 3px; align-self: flex-end; text-align: right; }
-        .nyx-message.other { background-color: var(--secondary-color); color: var(--text-color); border-bottom-left-radius: 3px; align-self: flex-start; }
-        .nyx-message .sender { font-size: 0.7em; opacity: 0.7; display: block; margin-bottom: 0.25rem; }
-        .nyx-message .timestamp { font-size: 0.6em; opacity: 0.6; display: block; margin-top: 0.5rem; }
-        .nyx-system-message { text-align: center; font-style: italic; color: var(--subtle-text-color); font-size: 0.9em; }
-        .nyx-message.secure-note {
-            background-color: rgba(255, 174, 0, 0.1);
-            border: 1px dashed var(--warning-color);
-            border-radius: 5px;
-            max-width: 100%;
-            align-self: center;
-            text-align: left;
-        }
-        .nyx-message.secure-note .sender { color: var(--warning-color); }
-        
-        .nyx-chat-actions { display: flex; gap: 0.5rem; }
-        .nyx-chat-actions input { flex-grow: 1; }
+        .self-destruct-message { padding: 2rem; border: 1px dashed var(--warning-color); border-radius: 10px; text-align: center; display: flex; flex-direction: column; gap: 1rem; }
+        .self-destruct-message p { font-size: 1.2rem; color: var(--warning-color); margin: 0; }
+        .self-destruct-message .message-content { background-color: var(--input-bg-color); padding: 1rem; border-radius: 8px; min-height: 100px; color: var(--text-color); white-space: pre-wrap; border: 1px solid var(--secondary-color); }
 
-        #nyxUserIdDisplay { padding: 0.5rem; margin-top: 1rem; background: var(--input-bg-color); border: 1px solid var(--info-color); border-radius: 8px; text-align: center; font-size: 0.8em; color: var(--subtle-text-color); user-select: all; }
-
-        /* --- Other Protocols Expander --- */
-        .protocols-expander summary { cursor: pointer; color: var(--primary-color); text-align: center; margin-bottom: 2rem; border: 1px solid var(--primary-color); padding: 0.75rem; border-radius: 8px; transition: background-color 0.3s ease; display: flex; justify-content: center; align-items: center; gap: 0.5rem; }
-        .protocols-expander summary:hover { background-color: rgba(0, 255, 204, 0.1); }
-        .protocols-expander summary::after { content: '▼'; display: inline-block; transition: transform 0.3s ease-out; }
-        .protocols-expander[open] > summary::after { transform: rotate(-180deg); }
-        
         .message-box { padding: 1rem; border-radius: 8px; text-align: center; font-size: 1em; display: none; transition: all 0.3s ease-out; border: 1px solid; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 5000; backdrop-filter: blur(5px); width: 90%; max-width: 500px; }
         .message-box.success { background-color: rgba(0, 255, 204, 0.2); color: var(--primary-color); border-color: var(--primary-color); box-shadow: 0 0 10px var(--primary-color); }
         .message-box.error { background-color: rgba(255, 0, 0, 0.3); color: var(--danger-color); border-color: var(--danger-color); box-shadow: 0 0 10px var(--danger-color); }
-        
-        #cerebrusStatus {
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            padding: 0.5rem; border: 1px solid; border-radius: 8px; margin-bottom: 2rem;
-            text-transform: uppercase; letter-spacing: 2px; font-weight: bold; transition: all 0.5s ease-in-out;
-        }
-        #cerebrusStatus .indicator { width: 12px; height: 12px; border-radius: 50%; transition: background-color 0.5s ease-in-out; }
-        #cerebrusStatus.connected { color: var(--success-color); border-color: var(--success-color); }
-        #cerebrusStatus.connected .indicator { background-color: var(--success-color); animation: pulse-green 2s infinite; }
-        #cerebrusStatus.disconnected { color: var(--danger-color); border-color: var(--danger-color); }
-        #cerebrusStatus.disconnected .indicator { background-color: var(--danger-color); animation: pulse-red 2s infinite; }
     </style>
 </head>
 
@@ -147,35 +120,24 @@
     <div id="messageBox" class="message-box"></div>
     
     <header>
-        <h1>OBSIDIAN-Vault v10.0</h1>
-        <p class="tagline">Cerebrus Edition</p>
+        <h1>WULYENA-CALESTARA Vault v12.0</h1>
+        <p class="tagline">Lazarus Edition</p>
     </header>
 
-    <main>
-        <div id="cerebrusStatus" class="disconnected">
-            <div class="indicator"></div>
-            <span id="cerebrusStatusText">Link Severed</span>
-        </div>
-
-        <section class="section-container" id="nyx-main-panel">
-            <h3>Nyx Protocol: Secure Messenger</h3>
-             <div class="input-group" id="nyxLoginView">
-                <label for="nyxRoomId">Room ID</label>
-                <input type="text" id="nyxRoomId" placeholder="Kosongkan untuk membuat room baru">
-                <label for="nyxRoomPassword">Room Password</label>
-                <input type="password" id="nyxRoomPassword" placeholder="Password untuk membuat atau bergabung...">
-                <div class="buttons-group" style="margin-top:1rem;">
-                    <button id="nyxCreateRoomBtn">Create Room</button>
-                    <button id="nyxJoinRoomBtn">Join Room</button>
+    <main id="main-content">
+        <section class="section-container" id="ghost-protocol-panel">
+            <h3>Ghost Protocol: Pesan Sekali Baca</h3>
+             <div id="ghost-creator-view">
+                <div class="input-group"><label for="ghostMessage">Pesan Rahasia</label><textarea id="ghostMessage" placeholder="Pesan ini akan hancur setelah dibaca..."></textarea></div>
+                <div class="input-group"><label for="ghostPassword">Password</label><input type="password" id="ghostPassword" placeholder="Buat password untuk link ini..."></div>
+                <div class="buttons-group" style="margin-top:1rem;"><button id="ghostGenerateBtn">Generate Ghost Link</button></div>
+                <div class="input-group" id="ghostLinkContainer" style="display:none;">
+                    <label>Ghost Link (Sekali Pakai)</label>
+                    <div id="ghostLinkOutput" style="background-color: var(--input-bg-color); padding:1rem; border-radius:8px; border: 1px solid var(--primary-color); word-wrap: break-word;"></div>
+                    <div class="output-actions"><button id="copyGhostLinkBtn">Salin Link</button></div>
                 </div>
-            </div>
-
-            <div id="nyxChatView" style="display: none; flex-direction:column; gap:1rem;">
-                <div class="input-group"><label>Obrolan Aman (<span id="nyxCurrentRoomId" style="color: var(--info-color); user-select: all;"></span>)</label><div id="nyxChatWindow"><div class="nyx-system-message">Membangun koneksi...</div></div></div>
-                <div class="input-group"><div class="nyx-chat-actions"><input type="text" id="nyxMessageInput" placeholder="Ketik pesan... awali dengan /note untuk catatan rahasia"><button id="nyxSendBtn">Send</button></div></div>
-                <div class="buttons-group"><button id="nyxLeaveRoomBtn">Leave Room</button><button id="nyxDestroyRoomBtn" class="danger">Destroy Room</button></div>
-            </div>
-             <div id="nyxUserIdDisplay">ID Sesi: <span id="nyxUserId" style="color: var(--warning-color);">Menunggu otentikasi...</span></div>
+             </div>
+             <div id="ghost-reader-view" style="display: none;"></div>
         </section>
 
         <details class="protocols-expander"><summary>Buka Protokol Enkripsi Lainnya</summary>
@@ -184,7 +146,7 @@
                  <div class="input-group"><label for="inputText">Teks Asli / Cipher</label><textarea id="inputText" placeholder="Ketik pesan rahasia..."></textarea></div>
                 <div class="input-group"><label for="password">Password</label><input type="password" id="password" placeholder="Password enkripsi/dekripsi..."></div>
                 <div class="buttons-group" style="margin-top:1rem;"><button id="encodeButton">Enkripsi</button><button id="decodeButton">Dekripsi</button><button id="stdResetButton" class="danger">Hapus</button></div>
-                <div class="input-group"><label for="outputResult">Hasil</label><div id="outputResult" style="min-height:80px; background-color: var(--input-bg-color); padding:1rem; border-radius:8px; border: 1px solid var(--primary-color); position:relative;"></div><div class="output-actions"><button id="copyOutputBtn">Salin</button></div></div>
+                <div class="input-group"><label for="outputResult">Hasil</label><div id="outputResult" style="min-height:80px; background-color: var(--input-bg-color); padding:1rem; border-radius:8px; border: 1px solid var(--primary-color);"></div><div class="output-actions"><button id="copyOutputBtn">Salin</button></div></div>
             </section>
             <section class="section-container">
                 <h3>Aegis Protocol</h3>
@@ -193,132 +155,56 @@
                 <div class="input-group"><label for="aegisPassword">Password Aegis</label><input type="password" id="aegisPassword" placeholder="Password untuk mengunci narasi..."></div>
                  <div class="input-group"><label for="aegisApiKey">Gemini API Key</label><input type="password" id="aegisApiKey" placeholder="Dapatkan dari Google AI Studio..."></div>
                 <div class="buttons-group" style="margin-top:1rem;"><button id="aegisGenerateAndEncryptButton">Samarkan & Enkripsi</button><button id="aegisDecryptButton">Dekripsi Narasi</button><button id="aegisResetButton" class="danger">Hapus</button></div>
-                 <div class="input-group"><label>Hasil / Ciphertext</label><div id="aegisOutput" style="min-height:80px; background-color: var(--input-bg-color); padding:1rem; border-radius:8px; border: 1px solid var(--primary-color); position:relative;"></div><div class="output-actions"><button id="copyAegisBtn">Salin</button></div></div>
+                 <div class="input-group"><label>Hasil / Ciphertext</label><div id="aegisOutput" style="min-height:80px; background-color: var(--input-bg-color); padding:1rem; border-radius:8px; border: 1px solid var(--primary-color);"></div><div class="output-actions"><button id="copyAegisBtn">Salin</button></div></div>
             </section>
         </details>
     </main>
     
     <footer style="text-align:center; padding:15px; color: #666; background:rgba(0,0,0,0.8); border-top: 1px solid #333; z-index:10;">
-        <p>Ultimate Edition v10.0 | For Calestara by WuLyena & Gemini</p>
+        <p>Lazarus Edition | For Wulyena by Calestara & Gemini</p>
     </footer>
     
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, addDoc, deleteDoc, onSnapshot, collection, query, orderBy, getDocs, serverTimestamp, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        
+    <script>
         document.addEventListener('DOMContentLoaded', () => {
             const vaultApp = {
                 els: {},
-                state: { db: null, auth: null, userId: null, currentRoomId: null, currentRoomPassword: null, nyxUnsubscribe: null },
-                
-                async init() {
+                init() {
                     this.cacheElements();
-                    this.modules.starfield.init.call(this);
-                    await this.initFirebase(); 
                     this.setupEventListeners();
+                    this.modules.starfield.init.call(this);
+                    this.modules.ghost.init.call(this);
                 },
-
                 cacheElements() {
                     const allIds = Array.from(document.querySelectorAll('[id]'));
                     allIds.forEach(el => this.els[el.id.replace(/-([a-z])/g, g => g[1].toUpperCase())] = el);
                 },
-
-                async initFirebase() {
-                    try {
-                        let firebaseConfig;
-                        if (typeof __firebase_config !== 'undefined' && __firebase_config) {
-                            firebaseConfig = JSON.parse(__firebase_config);
-                        } else {
-                            // --- PASTE YOUR FIREBASE CONFIG HERE ---
-                            // This is a placeholder. Replace it with your actual Firebase config object.
-                            // Go to Project settings > General > Your apps > Web app > SDK setup and configuration
-                            firebaseConfig = {
-                            const firebaseConfig = {
-                            apiKey: "AIzaSyBnAIwtw2F2RjVv5jsr2UUr8tf8rZrfEZw",
-                            authDomain: "wulyena-16ec5.firebaseapp.com",
-                            projectId: "wulyena-16ec5",
-                            storageBucket: "wulyena-16ec5.firebasestorage.app",
-                            messagingSenderId: "1018677883926",
-                            appId: "1:1018677883926:web:02c37145d6e570ac797137",
-                            measurementId: "G-YD1YQS0VG2"
-                        };
-
-                        }
-
-                        if (!firebaseConfig || firebaseConfig.apiKey === "AIzaSyBnAIwtw2F2RjVv5jsr2UUr8tf8rZrfEZw") {
-                           throw new Error("Konfigurasi Firebase belum diatur.");
-                        }
-                        
-                        const app = initializeApp(firebaseConfig);
-                        this.state.db = getFirestore(app);
-                        this.state.auth = getAuth(app);
-
-                        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-                        await (initialAuthToken ? signInWithCustomToken(this.state.auth, initialAuthToken) : signInAnonymously(this.state.auth));
-                        
-                        this.state.userId = this.state.auth.currentUser.uid;
-                        this.els.nyxUserId.textContent = this.state.userId;
-                        this.updateCerebrusStatus(true, "Link Established");
-
-                    } catch (e) {
-                         this.updateCerebrusStatus(false, "Link Severed");
-                         this.els.nyxMainPanel.innerHTML = `<div class="nyx-system-message" style="color:var(--danger-color);">Nyx Protocol Offline: ${e.message}</div>`;
-                    }
-                },
-                
-                updateCerebrusStatus(isConnected, message) {
-                    const statusEl = this.els.cerebrusStatus;
-                    statusEl.classList.toggle('connected', isConnected);
-                    statusEl.classList.toggle('disconnected', !isConnected);
-                    this.els.cerebrusStatusText.textContent = message;
-                },
-
                 setupEventListeners() {
-                    this.els.nyxCreateRoomBtn.addEventListener('click', () => this.modules.nyx.createRoom.call(this));
-                    this.els.nyxJoinRoomBtn.addEventListener('click', () => this.modules.nyx.joinRoom.call(this));
-                    this.els.nyxSendBtn.addEventListener('click', () => this.modules.nyx.sendMessage.call(this));
-                    this.els.nyxMessageInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); this.modules.nyx.sendMessage.call(this); }});
-                    this.els.nyxLeaveRoomBtn.addEventListener('click', () => this.modules.nyx.leaveRoom.call(this));
-                    this.els.nyxDestroyRoomBtn.addEventListener('click', () => this.modules.nyx.destroyRoom.call(this));
-                    
                     this.els.encodeButton.addEventListener('click', () => this.modules.standardCipher.encrypt.call(this));
                     this.els.decodeButton.addEventListener('click', () => this.modules.standardCipher.decrypt.call(this));
                     this.els.stdResetButton.addEventListener('click', () => this.modules.standardCipher.reset.call(this));
                     this.els.copyOutputBtn.addEventListener('click', (e) => this.copyToClipboard(this.els.outputResult.textContent, e.target));
-                    
+                    this.els.ghostGenerateBtn.addEventListener('click', () => this.modules.ghost.generateLink.call(this));
                     this.els.aegisGenerateAndEncryptButton.addEventListener('click', () => this.modules.aegis.generateAndEncrypt.call(this));
                     this.els.aegisDecryptButton.addEventListener('click', () => this.modules.aegis.decrypt.call(this));
                     this.els.aegisResetButton.addEventListener('click', () => this.modules.aegis.reset.call(this));
                     this.els.copyAegisBtn.addEventListener('click', (e) => this.copyToClipboard(this.els.aegisOutput.textContent, e.target));
                 },
-
                 copyToClipboard(text, buttonElement) {
-                    if (!text || text.trim() === '') {
-                        return this.showMessage("Tidak ada yang bisa disalin.", "error");
-                    }
+                    if (!text || text.trim() === '') return this.showMessage("Tidak ada yang bisa disalin.", "error");
                     const textArea = document.createElement("textarea");
                     textArea.value = text;
-                    textArea.style.position = "fixed"; 
-                    textArea.style.left = "-9999px";
+                    textArea.style.position = "fixed"; textArea.style.left = "-9999px";
                     document.body.appendChild(textArea);
-                    textArea.focus();
-                    textArea.select();
+                    textArea.focus(); textArea.select();
                     try {
                         document.execCommand('copy');
                         const originalText = buttonElement.textContent;
                         buttonElement.textContent = 'Tersalin!';
                         buttonElement.disabled = true;
-                        setTimeout(() => {
-                            buttonElement.textContent = originalText;
-                            buttonElement.disabled = false;
-                        }, 2000);
-                    } catch (err) {
-                        this.showMessage("Gagal menyalin.", "error");
-                    }
+                        setTimeout(() => { buttonElement.textContent = originalText; buttonElement.disabled = false; }, 2000);
+                    } catch (err) { this.showMessage("Gagal menyalin.", "error"); }
                     document.body.removeChild(textArea);
                 },
-
                 showMessage(message, type = 'info', duration = 4000) {
                      this.els.messageBox.textContent = message;
                      this.els.messageBox.className = `message-box ${type}`;
@@ -326,7 +212,6 @@
                      if (this.els.messageBox.timer) clearTimeout(this.els.messageBox.timer);
                      this.els.messageBox.timer = setTimeout(() => { this.els.messageBox.style.display = 'none'; }, duration);
                 },
-                
                 cryptoCore: {
                     bufferToBase64: (buffer) => btoa(String.fromCharCode.apply(null, new Uint8Array(buffer))),
                     base64ToBuffer: (base64) => Uint8Array.from(atob(base64), c => c.charCodeAt(0)),
@@ -356,7 +241,6 @@
                         return new TextDecoder().decode(decrypted);
                     }
                 },
-
                 modules: {
                     starfield: {
                         init() {
@@ -390,132 +274,87 @@
                             draw();
                         }
                     },
-                    nyx: {
-                        async createRoom() {
-                            const password = vaultApp.els.nyxRoomPassword.value;
-                            if (!password) return vaultApp.showMessage("Password ruangan wajib diisi.", "error");
-                            const nouns = ["alpha", "beta", "gamma", "delta", "omega", "sigma", "nova", "comet"];
-                            const roomId = `nyx-${nouns[Math.floor(Math.random() * nouns.length)]}-${Math.random().toString(36).substring(2, 6)}`;
-                            vaultApp.els.nyxRoomId.value = roomId;
-                            try {
-                                const checkCipher = await vaultApp.cryptoCore.encryptSingle("nyx-connection-test", password);
-                                await setDoc(doc(vaultApp.state.db, "nyx_rooms", roomId), { createdAt: serverTimestamp(), owner: vaultApp.state.userId, passwordCheck: checkCipher });
-                                vaultApp.showMessage(`Ruangan ${roomId} berhasil dibuat!`, "success");
-                                await vaultApp.modules.nyx.joinRoom.call(vaultApp, true);
-                            } catch (e) { vaultApp.showMessage(`Gagal membuat ruangan: ${e.message}`, "error"); }
-                        },
-                        async joinRoom(isCreator = false) {
-                            const roomId = vaultApp.els.nyxRoomId.value;
-                            const password = vaultApp.els.nyxRoomPassword.value;
-                            if (!roomId || !password) return vaultApp.showMessage("Room ID dan Password wajib diisi.", "error");
-                            try {
-                                const roomDoc = await getDoc(doc(vaultApp.state.db, "nyx_rooms", roomId));
-                                if (!roomDoc.exists()) return vaultApp.showMessage("Room ID tidak ditemukan.", "error");
-                                if (!isCreator) await vaultApp.cryptoCore.decryptSingle(roomDoc.data().passwordCheck, password);
-                                vaultApp.state.currentRoomId = roomId; vaultApp.state.currentRoomPassword = password;
-                                vaultApp.els.nyxLoginView.style.display = 'none'; vaultApp.els.nyxChatView.style.display = 'flex';
-                                vaultApp.els.nyxCurrentRoomId.textContent = roomId;
-                                vaultApp.els.nyxChatWindow.innerHTML = `<div class="nyx-system-message">Berhasil terhubung.</div>`;
-                                vaultApp.modules.nyx.listenForMessages.call(vaultApp);
-                            } catch (e) { vaultApp.showMessage("Gagal bergabung: Password salah.", "error"); }
-                        },
-                        listenForMessages() {
-                            const q = query(collection(vaultApp.state.db, "nyx_rooms", vaultApp.state.currentRoomId, "messages"), orderBy("timestamp", "asc"));
-                            if(vaultApp.state.nyxUnsubscribe) vaultApp.state.nyxUnsubscribe();
-                            vaultApp.state.nyxUnsubscribe = onSnapshot(q, (snapshot) => {
-                                const chatWindow = vaultApp.els.nyxChatWindow;
-                                if(chatWindow.querySelector('.nyx-system-message')) chatWindow.innerHTML = '';
-                                snapshot.docChanges().forEach(async (change) => {
-                                    if (change.type === 'added') {
-                                        try {
-                                            const decrypted = await vaultApp.cryptoCore.decryptSingle(change.doc.data().ciphertext, vaultApp.state.currentRoomPassword);
-                                            chatWindow.appendChild(vaultApp.modules.nyx.createMessageElement.call(vaultApp, decrypted, change.doc.data().sender, change.doc.data().timestamp));
-                                        } catch (e) { /* Ignore */ }
-                                    }
-                                });
-                                setTimeout(() => chatWindow.scrollTop = chatWindow.scrollHeight, 100);
-                            });
-                        },
-                        createMessageElement(text, senderId, timestamp) {
-                            const msgDiv = document.createElement('div');
-                            let isNote = text.startsWith('/note ');
-                            if (isNote) {
-                                text = text.substring(6);
-                                msgDiv.classList.add('secure-note');
+                    ghost: {
+                        init() {
+                            const hash = window.location.hash.substring(1);
+                            if (hash) {
+                                this.els.ghostCreatorView.style.display = 'none';
+                                this.els.ghostReaderView.style.display = 'block';
+                                this.modules.ghost.renderReaderView.call(this, hash);
                             }
-                            msgDiv.classList.add('nyx-message', senderId === vaultApp.state.userId ? 'self' : 'other');
-                            const senderName = senderId === vaultApp.state.userId ? "You" : `User: ${senderId.substring(0, 8)}...`;
-                            const timeString = timestamp ? new Date(timestamp.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
-                            const textNode = document.createElement('span'); textNode.textContent = text;
-                            msgDiv.innerHTML = `<span class="sender">${senderName}</span>`;
-                            msgDiv.appendChild(textNode);
-                            msgDiv.innerHTML += `<span class="timestamp">${timeString}</span>`;
-                            return msgDiv;
                         },
-                        async sendMessage() {
-                            const messageText = vaultApp.els.nyxMessageInput.value;
-                            if (!messageText.trim()) return;
+                        renderReaderView(hash) {
+                            this.els.ghostReaderView.innerHTML = `
+                                <div class="self-destruct-message">
+                                    <p>GHOST PROTOCOL: PESAN MASUK</p>
+                                    <span>Sebuah pesan terenkripsi terdeteksi. Masukkan password untuk membukanya. Pesan ini akan hancur setelah halaman ditutup.</span>
+                                    <div class="input-group"><input type="password" id="ghostReaderPassword" placeholder="Masukkan password untuk membaca..."></div>
+                                    <div class="buttons-group"><button id="ghostRevealBtn">Buka Pesan</button></div>
+                                </div>`;
+                            document.getElementById('ghostRevealBtn').addEventListener('click', () => this.modules.ghost.revealMessage.call(this, hash));
+                        },
+                        async revealMessage(hash) {
+                            const password = document.getElementById('ghostReaderPassword').value;
+                            if (!password) return this.showMessage("Password wajib diisi.", "error");
                             try {
-                                const ciphertext = await vaultApp.cryptoCore.encryptSingle(messageText, vaultApp.state.currentRoomPassword);
-                                await addDoc(collection(vaultApp.state.db, "nyx_rooms", vaultApp.state.currentRoomId, "messages"), { ciphertext, sender: vaultApp.state.userId, timestamp: serverTimestamp() });
-                                vaultApp.els.nyxMessageInput.value = ''; vaultApp.els.nyxMessageInput.focus();
-                            } catch (e) { vaultApp.showMessage("Gagal mengirim pesan.", "error"); }
+                                const decryptedMessage = await this.cryptoCore.decryptSingle(atob(hash), password);
+                                this.els.ghostReaderView.innerHTML = `
+                                <div class="self-destruct-message">
+                                    <p>PESAN TELAH DIBUKA</p>
+                                    <div class="message-content">${decryptedMessage.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
+                                    <span>Pesan ini telah hancur. Salin sekarang atau akan hilang selamanya.</span>
+                                    <div class="output-actions"><button id="copyGhostMessageBtn">Salin Pesan</button></div>
+                                </div>`;
+                                document.getElementById('copyGhostMessageBtn').addEventListener('click', (e) => this.copyToClipboard(decryptedMessage, e.target));
+                                history.replaceState(null, null, ' ');
+                            } catch (e) {
+                                this.showMessage("Dekripsi gagal: Password salah atau link rusak.", "error");
+                                this.els.ghostReaderView.innerHTML = `<div class="self-destruct-message"><p style="color:var(--danger-color)">DEKRIPSI GAGAL</p><span style="color:var(--danger-color);">Password salah. Link ini telah rusak dan pesan di dalamnya hancur.</span></div>`;
+                                history.replaceState(null, null, ' ');
+                            }
                         },
-                        leaveRoom() {
-                            if (vaultApp.state.nyxUnsubscribe) vaultApp.state.nyxUnsubscribe();
-                            Object.assign(vaultApp.state, { currentRoomId: null, currentRoomPassword: null });
-                            vaultApp.els.nyxChatView.style.display = 'none'; vaultApp.els.nyxLoginView.style.display = 'block';
-                            vaultApp.els.nyxRoomId.value = ''; vaultApp.els.nyxRoomPassword.value = '';
-                            vaultApp.showMessage("Anda telah meninggalkan ruangan.", "info");
-                        },
-                        async destroyRoom() {
-                            const roomId = vaultApp.state.currentRoomId;
-                            if (!roomId || prompt("PERINGATAN: Aksi ini akan menghapus seluruh riwayat chat secara permanen.\nKetik 'DESTROY' untuk konfirmasi.") !== 'DESTROY') return;
+                        async generateLink() {
+                            const { ghostMessage, ghostPassword, ghostLinkContainer, ghostLinkOutput } = this.els;
+                            if (!ghostMessage.value || !ghostPassword.value) return this.showMessage("Pesan dan Password wajib diisi.", "error");
                             try {
-                                const batch = writeBatch(vaultApp.state.db);
-                                const messagesSnapshot = await getDocs(collection(vaultApp.state.db, "nyx_rooms", roomId, "messages"));
-                                messagesSnapshot.forEach(doc => batch.delete(doc.ref));
-                                batch.delete(doc(vaultApp.state.db, "nyx_rooms", roomId));
-                                await batch.commit();
-                                vaultApp.modules.nyx.leaveRoom.call(vaultApp);
-                                vaultApp.showMessage("Ruangan berhasil dihancurkan.", "success");
-                            } catch (e) { vaultApp.showMessage("Gagal menghancurkan ruangan.", "error"); }
+                                const ciphertext = await this.cryptoCore.encryptSingle(ghostMessage.value, ghostPassword.value);
+                                const payload = btoa(ciphertext);
+                                const finalLink = `${window.location.href.split('#')[0]}#${payload}`;
+                                ghostLinkOutput.textContent = finalLink;
+                                ghostLinkContainer.style.display = 'block';
+                                if (!document.getElementById('copyGhostLinkBtn')) {
+                                    const copyBtn = document.createElement('button');
+                                    copyBtn.id = 'copyGhostLinkBtn';
+                                    copyBtn.textContent = 'Salin Link';
+                                    this.els.ghostLinkContainer.querySelector('.output-actions').appendChild(copyBtn);
+                                }
+                                document.getElementById('copyGhostLinkBtn').onclick = (e) => this.copyToClipboard(finalLink, e.target);
+                                this.showMessage("Ghost Link berhasil dibuat!", "success");
+                            } catch (e) { this.showMessage("Gagal membuat link.", "error"); }
                         }
                     },
                     standardCipher: {
-                        reset() {
-                            vaultApp.els.inputText.value = '';
-                            vaultApp.els.password.value = '';
-                            vaultApp.els.outputResult.textContent = '';
-                        },
+                        reset() { this.els.inputText.value = ''; this.els.password.value = ''; this.els.outputResult.textContent = ''; },
                         async encrypt() {
-                            if (!vaultApp.els.inputText.value || !vaultApp.els.password.value) return vaultApp.showMessage("Teks dan Password wajib diisi.", "error");
+                            if (!this.els.inputText.value || !this.els.password.value) return this.showMessage("Teks dan Password wajib diisi.", "error");
                             try {
-                                const ciphertext = await vaultApp.cryptoCore.encryptSingle(vaultApp.els.inputText.value, vaultApp.els.password.value);
-                                vaultApp.els.outputResult.textContent = ciphertext;
-                                vaultApp.showMessage("Enkripsi berhasil.", "success");
-                            } catch(e) { vaultApp.showMessage("Enkripsi gagal.", "error"); }
+                                this.els.outputResult.textContent = await this.cryptoCore.encryptSingle(this.els.inputText.value, this.els.password.value);
+                                this.showMessage("Enkripsi berhasil.", "success");
+                            } catch(e) { this.showMessage("Enkripsi gagal.", "error"); }
                         },
                         async decrypt() {
-                            if (!vaultApp.els.inputText.value || !vaultApp.els.password.value) return vaultApp.showMessage("Ciphertext dan Password wajib diisi.", "error");
+                            if (!this.els.inputText.value || !this.els.password.value) return this.showMessage("Ciphertext dan Password wajib diisi.", "error");
                             try {
-                                const decrypted = await vaultApp.cryptoCore.decryptSingle(vaultApp.els.inputText.value, vaultApp.els.password.value);
-                                vaultApp.els.outputResult.textContent = decrypted;
-                                vaultApp.showMessage("Dekripsi berhasil.", "success");
-                            } catch (e) { vaultApp.showMessage("Dekripsi gagal: Password salah atau data korup.", "error"); }
+                                this.els.outputResult.textContent = await this.cryptoCore.decryptSingle(this.els.inputText.value, this.els.password.value);
+                                this.showMessage("Dekripsi berhasil.", "success");
+                            } catch (e) { this.showMessage("Dekripsi gagal: Password salah atau data korup.", "error"); }
                         }
                     },
                     aegis: {
-                         reset() {
-                            vaultApp.els.aegisInput.value = '';
-                            vaultApp.els.aegisStyle.value = '';
-                            vaultApp.els.aegisPassword.value = '';
-                            vaultApp.els.aegisApiKey.value = '';
-                            vaultApp.els.aegisOutput.textContent = '';
-                        },
+                        reset() { this.els.aegisInput.value = ''; this.els.aegisStyle.value = ''; this.els.aegisPassword.value = ''; this.els.aegisApiKey.value = ''; this.els.aegisOutput.textContent = ''; },
                         async generateAndEncrypt() {
-                             const { aegisInput, aegisStyle, aegisPassword, aegisApiKey, aegisOutput } = vaultApp.els;
-                             if (!aegisInput.value || !aegisStyle.value || !aegisPassword.value || !aegisApiKey.value) return vaultApp.showMessage("Semua kolom Aegis wajib diisi.", "error");
+                             const { aegisInput, aegisStyle, aegisPassword, aegisApiKey, aegisOutput } = this.els;
+                             if (!aegisInput.value || !aegisStyle.value || !aegisPassword.value || !aegisApiKey.value) return this.showMessage("Semua kolom Aegis wajib diisi.", "error");
                              aegisOutput.innerHTML = '<div class="nyx-system-message">Menghubungi AI...</div>';
                              const prompt = `Ubah pesan rahasia berikut: "${aegisInput.value}" menjadi sebuah narasi puitis dengan gaya: "${aegisStyle.value}". Jangan sebutkan pesan aslinya.`;
                              try {
@@ -527,18 +366,18 @@
                                 const result = await response.json();
                                 const poem = result.candidates[0].content.parts[0].text.trim();
                                 aegisOutput.innerHTML = '<div class="nyx-system-message">Mengenkripsi narasi...</div>';
-                                const ciphertext = await vaultApp.cryptoCore.encryptSingle(poem, aegisPassword.value);
+                                const ciphertext = await this.cryptoCore.encryptSingle(poem, aegisPassword.value);
                                 aegisOutput.textContent = ciphertext;
-                                vaultApp.showMessage("Narasi berhasil dibuat & dienkripsi!", "success");
-                            } catch (e) { vaultApp.showMessage(`Error Aegis: ${e.message}`, "error"); aegisOutput.textContent = ''; }
+                                this.showMessage("Narasi berhasil dibuat & dienkripsi!", "success");
+                            } catch (e) { this.showMessage(`Error Aegis: ${e.message}`, "error"); aegisOutput.textContent = ''; }
                         },
                         async decrypt() {
-                            const { aegisOutput, aegisPassword } = vaultApp.els;
-                            if (!aegisOutput.textContent || !aegisPassword.value) return vaultApp.showMessage("Ciphertext dan Password Aegis wajib diisi.", "error");
+                            const { aegisOutput, aegisPassword } = this.els;
+                            if (!aegisOutput.textContent || !aegisPassword.value) return this.showMessage("Ciphertext dan Password Aegis wajib diisi.", "error");
                             try {
-                                const decrypted = await vaultApp.cryptoCore.decryptSingle(aegisOutput.textContent, aegisPassword.value);
+                                const decrypted = await this.cryptoCore.decryptSingle(aegisOutput.textContent, aegisPassword.value);
                                 aegisOutput.textContent = decrypted;
-                            } catch(e) { vaultApp.showMessage("Dekripsi Aegis gagal.", "error"); }
+                            } catch(e) { this.showMessage("Dekripsi Aegis gagal.", "error"); }
                         }
                     }
                 }
