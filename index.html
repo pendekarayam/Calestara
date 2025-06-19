@@ -235,22 +235,17 @@
                     this.els.decodeButton.addEventListener('click', () => this.modules.standardCipher.decrypt.call(this));
                     this.els.stdResetButton.addEventListener('click', () => this.modules.standardCipher.reset.call(this));
                     this.els.copyOutputBtn.addEventListener('click', (e) => this.copyToClipboard(this.els.outputResult.textContent, e.target));
-                    
                     this.els.ghostGenerateBtn.addEventListener('click', () => this.modules.ghost.generateLink.call(this));
-                    
                     this.els.aegisGenerateAndEncryptButton.addEventListener('click', () => this.modules.aegis.generateAndEncrypt.call(this));
                     this.els.aegisDecryptButton.addEventListener('click', () => this.modules.aegis.decrypt.call(this));
                     this.els.aegisResetButton.addEventListener('click', () => this.modules.aegis.reset.call(this));
                     this.els.copyAegisBtn.addEventListener('click', (e) => this.copyToClipboard(this.els.aegisOutput.textContent, e.target));
-
                     this.els.erebusGenerateBtn.addEventListener('click', () => this.modules.erebus.generate.call(this));
                     this.els.copyErebusBtn.addEventListener('click', (e) => this.copyToClipboard(this.els.erebusOutput.textContent, e.target));
                     this.els.erebusLength.addEventListener('input', () => this.els.erebusLengthLabel.textContent = this.els.erebusLength.value);
-                    
                     this.els.caelusHideBtn.addEventListener('click', () => this.modules.caelus.hide.call(this));
                     this.els.caelusRevealBtn.addEventListener('click', () => this.modules.caelus.reveal.call(this));
                     this.els.copyCaelusBtn.addEventListener('click', (e) => this.copyToClipboard(this.els.caelusJunkText.value, e.target));
-                    
                     this.els.langId.addEventListener('click', () => this.modules.language.setLanguage.call(this, 'id'));
                     this.els.langEn.addEventListener('click', () => this.modules.language.setLanguage.call(this, 'en'));
                 },
@@ -374,9 +369,17 @@
                             } catch (e) {
                                 this.showMessage(this.modules.language.translations[this.state.lang].decrypt_fail, "error");
                                 const failedText = this.modules.language.translations[this.state.lang].ghost_failed;
-                                this.els.ghostReaderView.innerHTML = `<div class="self-destruct-message"><p style="color:var(--danger-color)">${failedText.title}</p><span style="color:var(--danger-color);">${failedText.description}</span></div>`;
+                                this.els.ghostReaderView.innerHTML = `<div class="self-destruct-message"><p style="color:var(--danger-color)">${failedText.title}</p><span style="color:var(--danger-color);">${failedText.description}</span><div class="message-content" style="color: var(--subtle-text-color); font-size: 0.8em;">${this.modules.ghost.generateDecoyText()}</div></div>`;
                                 history.replaceState(null, null, ' ');
                             }
+                        },
+                        generateDecoyText() {
+                            const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/+=';
+                            let result = '';
+                            for (let i = 0; i < 256; i++) {
+                                result += chars.charAt(Math.floor(Math.random() * chars.length));
+                            }
+                            return result;
                         },
                         async generateLink() {
                             const { ghostMessage, ghostPassword, ghostLinkContainer, ghostLinkOutput } = this.els;
@@ -504,6 +507,7 @@
                                 caelus_junk_placeholder: 'Hasil enkripsi akan muncul di sini...',
                                 copy_all_btn: 'Salin Semua',
                                 footer_text: 'Apex Edition | Wulyena & Calestara',
+                                guide_title: "Panduan Penggunaan",
                                 copied: 'Tersalin!', nothing_to_copy: "Tidak ada yang bisa disalin.", copy_failed: "Gagal menyalin.",
                                 password_required: "Password wajib diisi.",
                                 std_error: "Teks dan Password wajib diisi.",
@@ -514,10 +518,9 @@
                                 ghost_error: "Pesan dan Password wajib diisi.", ghost_success: "Ghost Link berhasil dibuat!",
                                 caelus_error: "Pesan Singkat dan Password wajib diisi.", caelus_hide_success: "Pesan berhasil dienkripsi.", caelus_hide_fail: "Gagal menyembunyikan pesan.",
                                 caelus_reveal_error: "Teks Cipher dan Password wajib diisi.", caelus_reveal_success: "Pesan Terungkap", caelus_reveal_fail: "Gagal menampilkan pesan: Password salah atau teks bukan cipher yang valid.",
-                                guide_title: "Panduan Penggunaan",
                                 ghost_reader: { title: "GHOST PROTOCOL: PESAN MASUK", description: "Sebuah pesan terenkripsi terdeteksi. Masukkan password untuk membukanya. Pesan ini akan hancur setelah halaman ditutup.", placeholder: "Masukkan password untuk membaca...", button: "Buka Pesan" },
-                                ghost_revealed: { title: "PESAN TERBUKA & AKAN HANCUR", description: "PERINGATAN: Salin pesan ini sekarang! Link asli masih dapat digunakan. Segera tutup halaman ini untuk keamanan maksimal.", button: "Salin Pesan & Hancurkan Jejak"},
-                                ghost_failed: { title: "DEKRIPSI GAGAL", description: "Password salah. Link ini telah rusak dan pesan di dalamnya hancur."},
+                                ghost_revealed: { title: "PESAN TERBUKA & AKAN HANCUR", description: "PERINGATAN: Salin pesan ini sekarang! Link ini telah hancur dan tidak bisa dibuka lagi.", button: "Salin Pesan"},
+                                ghost_failed: { title: "DEKRIPSI GAGAL: ANOMALI TERDETEKSI", description: "Password salah atau data korup. Tampilan pesan palsu dihasilkan untuk keamanan. Link ini sekarang hancur."},
                                 guide_content: {
                                     ghost: { title: "Ghost Protocol (Pesan Sekali Baca)", description: "Gunakan ini untuk mengirim pesan yang paling sensitif. Penerima hanya punya satu kesempatan untuk membaca. Setelah link dibuka dan halaman ditutup, pesan akan hancur selamanya dan link menjadi tidak valid.", steps: ["Masukkan pesan rahasia dan buat password.", "Klik <code>Generate Ghost Link</code>.", "Salin link yang muncul dan kirim ke penerima.", "Berikan password melalui jalur yang berbeda (telepon, chat lain, dll)."] },
                                     standard: { title: "Standard Cipher Protocol", description: "Gunakan ini untuk mengenkripsi atau mendekripsi teks biasa dengan cepat menggunakan password. Hasilnya adalah teks acak (ciphertext) yang bisa Anda salin dan tempel di mana saja." },
@@ -603,8 +606,8 @@
                                 caelus_reveal_fail: "Failed to reveal message: Wrong password or invalid ciphertext.",
                                 guide_title: "User Guide",
                                 ghost_reader: { title: "GHOST PROTOCOL: INCOMING MESSAGE", description: "An encrypted message was detected. Enter the password to decrypt it. This message will be destroyed once the page is closed.", placeholder: "Enter password to read...", button: "Reveal Message" },
-                                ghost_revealed: { title: "MESSAGE REVEALED & PRIMED", description: "WARNING: Copy this message now! The original link can still be used. Close this page immediately for maximum security.", button: "Copy Message & Burn Trace"},
-                                ghost_failed: { title: "DECRYPTION FAILED", description: "The password was incorrect. This link is now corrupted and the message is destroyed."},
+                                ghost_revealed: { title: "MESSAGE REVEALED & DESTROYED", description: "WARNING: Copy this message now! The original link is now invalid and the message is gone forever.", button: "Copy Message & Burn Trace"},
+                                ghost_failed: { title: "DECRYPTION ANOMALY DETECTED", description: "Incorrect password or corrupted data. Decoy output generated for security. This link is now destroyed."},
                                 guide_content: {
                                     ghost: { title: "Ghost Protocol (One-Time Message)", description: "Use this to send your most sensitive messages. The recipient has only one chance to read it. Once the link is opened and the page is closed, the message is destroyed forever and the link becomes invalid.", steps: ["Enter the secret message and create a password.", "Click <code>Generate Ghost Link</code>.", "Copy the resulting link and send it to the recipient.", "Provide the password through a different channel (phone, another chat, etc.)."] },
                                     standard: { title: "Standard Cipher Protocol", description: "Use this to quickly encrypt or decrypt plain text using a password. The result is a random-looking text (ciphertext) that you can copy and paste anywhere." },
